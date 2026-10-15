@@ -1,0 +1,454 @@
+(* KidML - 3.1.1 Core Language *)
+
+(* list notation shared by all modules *)
+module Notation
+
+  use list.List
+
+  let function (::) (a: 'a) (l: list 'a) : list 'a = Cons a l
+  meta rewrite_def function (::)
+
+end
+
+(* syntax *)
+module Syntax
+
+  use int.Int
+  use string.String
+  use list.List
+  use list.Mem
+  use Notation
+
+  type ident = string
+
+  type ghost_status = Reg | Ghost
+
+  type const = CInt int | CBool bool | CUnit
+
+  type value = VConst const
+
+  type atom = AVar ident | AVal value
+
+  type expr =
+    | EAtoms (list atom)
+    | ELet   (list (ghost_status, ident)) expr expr
+    | EGhost expr
+    | EIf    atom expr expr
+
+  (* let reg x = 42 in ghost x *)
+  constant ex1 : expr =
+    ELet ((Reg, "x") :: Nil)
+         (EAtoms (AVal (VConst (CInt 42)) :: Nil))
+         (EGhost (EAtoms (AVar "x" :: Nil)))
+         
+  function binder_names (bs : list (ghost_status, ident)) : list ident =
+    match bs with
+    | Nil           -> Nil
+    | Cons (_, x) r -> Cons x (binder_names r)
+    end
+
+  predicate distinct (l: list ident) =
+    match l with
+    | Nil      -> true
+    | Cons x r -> not (mem x r) /\ distinct r
+    end
+
+end
+
+(* masks: order relation (Fig. 3.1) and union (Fig. 3.2) *)
+module Masks
+
+  use list.List
+  use Syntax
+
+  type mask = list ghost_status
+
+  predicate le_status (b1 b2 : ghost_status) =
+    b1 = Reg \/ b2 = Ghost
+
+  predicate le_mask (m1 m2 : mask) =
+    match m1, m2 with
+    | Nil, Nil               -> true
+    | Cons b1 r1, Cons b2 r2 -> le_status b1 b2 /\ le_mask r1 r2
+    | _                      -> false
+    end
+
+  function join_status (b1 b2 : ghost_status) : ghost_status =
+    match b1 with
+    | Ghost -> Ghost
+    | Reg   -> b2
+    end
+
+  function mask_union (m1 m2 : mask) : mask =
+    match m1, m2 with
+    | Nil, Nil               -> Nil
+    | Cons b1 r1, Cons b2 r2 -> Cons (join_status b1 b2) (mask_union r1 r2)
+    | _                      -> Nil  (* lengths differ: unused junk value *)
+    end
+
+end
+
+(* types, typing contexts, and operations on types (Fig. 3.3) *)
+module Types
+
+  use int.Int
+  use list.List
+  use map.Map
+  use map.Const
+  use option.Option
+  use Syntax
+  use Masks
+
+  type tvar = int
+
+  type tcons = TInt | TBool | TUnit
+
+  type ty = TVar tvar | TApp tcons (list ty)
+
+  type aty = (ghost_status, ty)
+
+  type pi = list aty
+
+  type ctx = map ident (option aty)
+
+  constant empty_ctx : ctx = const None
+
+  (* oracle to retrieve the type of a constant c *)
+  function typeof (c : const) : ty =
+    match c with
+    | CInt  _ -> TApp TInt Nil
+    | CBool _ -> TApp TBool Nil
+    | CUnit   -> TApp TUnit Nil
+    end
+
+  (* extension of the typing context *)
+  function extend (c : ctx) (bs : list (ghost_status, ident)) (ts : list ty) : ctx =
+    match bs, ts with
+    | Cons (s, x) bs1, Cons t ts1 -> extend c[x <- Some (s, t)] bs1 ts1
+    | _                           -> c
+    end
+
+  (* projections of pi *)
+  function mask_of (p : pi) : mask =
+    match p with
+    | Nil           -> Nil
+    | Cons (s, _) r -> Cons s (mask_of r)
+    end
+
+  function types_of (p : pi) : list ty =
+    match p with
+    | Nil           -> Nil
+    | Cons (_, t) r -> Cons t (types_of r)
+    end
+
+  (* type ghostification *)
+  function ghostification (p : pi) : pi =
+    match p with
+    | Nil           -> Nil
+    | Cons (_, t) r -> Cons (Ghost, t) (ghostification r)
+    end
+
+  (* type union *)
+  function type_union (p1 p2 : pi) : option pi =
+    match p1, p2 with
+    | Nil, Nil -> Some Nil
+    | Cons (b1, t1) r1, Cons (b2, t2) r2 ->
+      if t1 = t2 then
+        match type_union r1 r2 with
+        | Some r -> Some (Cons (join_status b1 b2, t1) r)
+        | None   -> None
+        end
+      else None
+    | _ -> None
+    end
+
+end
+
+(* typing: type system of KidML *)
+module Typing
+
+  use list.List
+  use list.Mem
+  use map.Map
+  use option.Option
+  use Syntax
+  use Masks
+  use Types
+
+  (* (TConst) and (TVar): typing a single atom *)
+  function typing_atom (c : ctx) (a : atom) : option aty =
+    match a with
+    | AVal (VConst k) -> Some (Reg, typeof k)
+    | AVar x          -> c[x]
+    end
+
+  (* (TABar): typing a sequence of atoms, one atom at a time *)
+  function typing_atoms (c : ctx) (l : list atom) : option pi =
+    match l with
+    | Nil      -> Some Nil
+    | Cons a r ->
+        match typing_atom c a, typing_atoms c r with
+        | Some t, Some p -> Some (Cons t p)
+        | _              -> None
+        end
+    end
+    
+  (* (TLet) helper *)
+  function binder_mask (bs : list (ghost_status, ident)) : mask =
+    match bs with
+    | Nil           -> Nil
+    | Cons (s, _) r -> Cons s (binder_mask r)
+    end
+
+  (* typing judgment *)
+  inductive typing (c : ctx) (e : expr) (p : pi) =
+    | t_atoms    : forall c l p.
+        typing_atoms c l = Some p -> typing c (EAtoms l) p
+    | t_ghost    : forall c e p.
+        typing c e p -> typing c (EGhost e) (ghostification p)
+    | t_if       : forall c a e1 e2 p1 p2 p.
+        typing_atom c a = Some (Reg, TApp TBool Nil) ->
+        typing c e1 p1 ->
+        typing c e2 p2 ->
+        type_union p1 p2 = Some p ->
+        typing c (EIf a e1 e2) p
+        (* length p = p1 /\ p2 *)
+    | t_if_ghost : forall c a e1 e2 p1 p2 p.
+        typing_atom c a = Some (Ghost, TApp TBool Nil) ->
+        typing c e1 p1 ->
+        typing c e2 p2 ->
+        type_union p1 p2 = Some p ->
+        typing c (EIf a e1 e2) (ghostification p)
+    | t_let : forall c bs e1 e2 p1 p2.
+        typing c e1 p1 ->
+        le_mask (mask_of p1) (binder_mask bs) ->
+        (* formalização em papel não precisa de tanto detalhe *)
+        distinct (binder_names bs) ->
+        typing (extend c bs (types_of p1)) e2 p2 ->
+        typing c (ELet bs e1 e2) p2
+
+end
+
+(* sanity checks for typing *)
+module TypingExamples
+
+  use int.Int
+  use list.List
+  use map.Map
+  use option.Option
+  use Notation
+  use Syntax
+  use Types
+  use Typing
+
+  (* sanity checks for the typing of atoms and of sequences of atoms *)
+  goal atoms_const:
+    typing_atoms empty_ctx (AVal (VConst (CInt 42)) :: Nil)
+      = Some ((Reg, TApp TInt Nil) :: Nil)
+
+  goal atoms_var:
+    typing_atoms empty_ctx["x" <- Some (Ghost, TApp TBool Nil)] (AVar "x" :: Nil)
+      = Some ((Ghost, TApp TBool Nil) :: Nil)
+
+  goal atoms_unbound:
+    typing_atoms empty_ctx (AVar "x" :: Nil) = None
+
+  goal typing_42:
+    typing empty_ctx (EAtoms (AVal (VConst (CInt 42)) :: Nil))
+                     ((Reg, TApp TInt Nil) :: Nil)
+
+  (* sanity checks for the typing of ghost expressions *)
+  goal typing_ghost_42:
+    typing empty_ctx (EGhost (EAtoms (AVal (VConst (CInt 42)) :: Nil)))
+                     ((Ghost, TApp TInt Nil) :: Nil)
+
+  goal typing_ghost_pair:
+    typing empty_ctx
+      (EGhost (EAtoms (AVal (VConst (CInt 42)) :: (AVal (VConst (CBool true)) :: Nil))))
+      ((Ghost, TApp TInt Nil) :: ((Ghost, TApp TBool Nil) :: Nil))
+
+  goal typing_ghost_ghost_42:
+    typing empty_ctx (EGhost (EGhost (EAtoms (AVal (VConst (CInt 42)) :: Nil))))
+                     ((Ghost, TApp TInt Nil) :: Nil)
+
+  (* sanity checks for the typing of if..then..else expressions *)
+  goal if_reg:
+    typing empty_ctx
+      (EIf (AVal (VConst (CBool true)))
+           (EAtoms (AVal (VConst (CInt 1)) :: Nil))
+           (EAtoms (AVal (VConst (CInt 2)) :: Nil)))
+      ((Reg, TApp TInt Nil) :: Nil)
+
+  goal if_contaminated:
+    typing empty_ctx
+      (EIf (AVal (VConst (CBool true)))
+           (EGhost (EAtoms (AVal (VConst (CInt 1)) :: Nil)))
+           (EAtoms (AVal (VConst (CInt 2)) :: Nil)))
+      ((Ghost, TApp TInt Nil) :: Nil)
+
+  goal if_ghost_test:
+    typing (empty_ctx["x" <- Some (Ghost, TApp TBool Nil)])
+      (EIf (AVar "x")
+           (EAtoms (AVal (VConst (CInt 1)) :: Nil))
+           (EAtoms (AVal (VConst (CInt 2)) :: Nil)))
+      ((Ghost, TApp TInt Nil) :: Nil)
+
+  goal typing_ex1:
+    typing empty_ctx ex1 ((Ghost, TApp TInt Nil) :: Nil)
+
+  goal let_reg_into_ghost:
+    typing empty_ctx
+      (ELet ((Ghost, "x") :: Nil)
+            (EAtoms (AVal (VConst (CInt 42)) :: Nil))
+            (EAtoms (AVar "x" :: Nil)))
+      ((Ghost, TApp TInt Nil) :: Nil)
+
+  (* 
+  goal distinct_names: "x" <> "y"
+
+  goal lookup_other:
+    (empty_ctx["x" <- Some (Reg, TApp TInt Nil)])["y"] = None
+
+  goal lookup_two:
+    (empty_ctx["x" <- Some (Reg, TApp TInt Nil)]["y" <- Some (Ghost, TApp TBool Nil)])["x"]
+      = Some (Reg, TApp TInt Nil)
+  *)
+  
+end
+
+(* subst: substitution of values for variables *)
+module Subst
+
+  use list.List
+  use list.Mem
+  use Notation
+  use Syntax
+  
+  (* a[x -> v] *)
+  function subst_atom (x : ident) (v : value) (a : atom) : atom =
+    match a with
+    | AVar y -> if y = x then AVal v else a
+    | AVal _ -> a 
+    end
+  
+  (* abar[x -> v] *)
+  function subst_atoms (x : ident) (v : value) (l : list atom) : list atom =
+    match l with 
+    | Nil      -> Nil
+    | Cons a r -> Cons (subst_atom x v a) (subst_atoms x v r)
+    end
+    
+  (* e[x -> v] *)
+  function subst (x : ident) (v : value) (e : expr) : expr =
+    match e with
+    | EAtoms l      -> EAtoms (subst_atoms x v l)
+    | ELet bs e1 e2 -> ELet bs (subst x v e1) 
+                               (if mem x (binder_names bs) then e2 else subst x v e2)
+    | EGhost e1     -> EGhost (subst x v e1)
+    | EIf a e1 e2   -> EIf (subst_atom x v a) (subst x v e1) (subst x v e2)
+    end 
+    
+  (* e[xbar -> vbar]: one variable at a time *)
+  function subst_all (xs : list ident) (vs : list value) (e : expr) : expr =
+    match xs, vs with
+    | Cons x xs1, Cons v vs1 -> subst_all xs1 vs1 (subst x v e)
+    | _                      -> e
+    end
+  
+  (* x[x -> 42] = 42 *)
+  goal subst_var:
+    subst "x" (VConst (CInt 42)) (EAtoms (AVar "x" :: Nil))
+      = EAtoms (AVal (VConst (CInt 42)) :: Nil)
+      
+  (* shadowing: in let x = x in x, only the first x is free *)
+  goal subst_shadow:
+    subst "x" (VConst (CInt 42))
+      (ELet ((Reg, "x") :: Nil) (EAtoms (AVar "x" :: Nil)) (EAtoms (AVar "x" :: Nil)))
+    = ELet ((Reg, "x") :: Nil) (EAtoms (AVal (VConst (CInt 42)) :: Nil)) (EAtoms (AVar "x" :: Nil)) 
+     
+end
+
+(* semantics: big-step operational semantics *)
+module Semantics
+
+  use list.List
+  use list.Length
+  use option.Option
+  use Syntax
+  use Subst
+  
+  (* the values among a list of atoms *)
+  function atoms_values (l : list atom) : option (list value) =
+    match l with
+    | Nil             -> Some Nil
+    | Cons (AVal v) r ->
+        match atoms_values r with
+        | Some vs -> Some (Cons v vs)
+        | None    -> None
+        end
+    | Cons (AVar _) _ -> None
+    end 
+  
+  (* evaluation judgment *)  
+  inductive eval (e : expr) (vs : list value) =
+    | eval_vbar     : forall l vs.
+        atoms_values l = Some vs -> eval (EAtoms l) vs
+    | eval_ghost    : forall e vs.
+        eval e vs  -> eval (EGhost e) vs
+    | eval_if_true  : forall e1 e2 vs.
+        eval e1 vs -> eval (EIf (AVal (VConst (CBool true))) e1 e2) vs
+    | eval_if_false : forall e1 e2 vs.
+        eval e2 vs -> eval (EIf (AVal (VConst (CBool false))) e1 e2) vs 
+    | eval_let : forall bs e1 e2 vs1 vs.
+        eval e1 vs1 ->
+        length bs = length vs1 ->
+        distinct (binder_names bs) ->
+        eval (subst_all (binder_names bs) vs1 e2) vs ->
+        eval (ELet bs e1 e2) vs
+
+end
+
+(* sanity checks for evaluation *)
+module SemanticsExamples
+
+  use int.Int
+  use list.List
+  use option.Option
+  use Notation
+  use Syntax
+  use Semantics
+
+  (* a variable among the atoms blocks evaluation *)
+  goal values_var:
+    atoms_values (AVal (VConst (CInt 1)) :: (AVar "x" :: Nil)) = None
+
+  (* (EvalVBar) *)
+  lemma eval_1:
+    eval (EAtoms (AVal (VConst (CInt 1)) :: Nil)) (VConst (CInt 1) :: Nil)
+
+  lemma eval_42:
+    eval (EAtoms (AVal (VConst (CInt 42)) :: Nil)) (VConst (CInt 42) :: Nil)
+
+  (* (EvalGhost): ghost has no effect on execution *)
+  goal eval_ghost_42:
+    eval (EGhost (EAtoms (AVal (VConst (CInt 42)) :: Nil))) (VConst (CInt 42) :: Nil)
+
+  (* (EvalIfTrue) *)
+  goal eval_if_true:
+    eval (EIf (AVal (VConst (CBool true)))
+              (EAtoms (AVal (VConst (CInt 1)) :: Nil))
+              (EAtoms (AVal (VConst (CInt 42)) :: Nil)))
+         (VConst (CInt 1) :: Nil)
+
+  (* (EvalLet): ex1 = let reg x = 42 in ghost x evaluates to 42 *)
+  goal eval_ex1:
+    eval ex1 (VConst (CInt 42) :: Nil)
+
+  (* (EvalLet), shadowing: let reg x = 1 in (let reg x = 42 in x) evaluates to 42 *)
+  goal eval_shadow:
+    eval (ELet ((Reg, "x") :: Nil) (EAtoms (AVal (VConst (CInt 1)) :: Nil))
+           (ELet ((Reg, "x") :: Nil) (EAtoms (AVal (VConst (CInt 42)) :: Nil))
+             (EAtoms (AVar "x" :: Nil))))
+         (VConst (CInt 42) :: Nil)
+
+end

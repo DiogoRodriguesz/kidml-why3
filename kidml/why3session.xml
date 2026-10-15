@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"https://www.why3.org/why3session.dtd">
+<why3session shape_version="6">
+<prover id="0" name="Z3" version="4.15.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="2.4.3" timelimit="5" steplimit="0" memlimit="1000"/>
+<file format="whyml">
+<path name=".."/><path name="kidml.mlw"/>
+<theory name="TypingExamples">
+ <goal name="atoms_const" proved="true">
+ <proof prover="1"><result status="valid" time="0.013336" steps="167"/></proof>
+ </goal>
+ <goal name="atoms_var" proved="true">
+ <proof prover="1"><result status="valid" time="0.016067" steps="149"/></proof>
+ </goal>
+ <goal name="atoms_unbound" proved="true">
+ <proof prover="1"><result status="valid" time="0.011799" steps="90"/></proof>
+ </goal>
+ <goal name="typing_42" proved="true">
+ <proof prover="1"><result status="valid" time="0.040337" steps="893"/></proof>
+ </goal>
+ <goal name="typing_ghost_42" proved="true">
+ <proof prover="1"><result status="valid" time="0.230304" steps="5447"/></proof>
+ </goal>
+ <goal name="typing_ghost_pair" proved="true">
+ <proof prover="1"><result status="valid" time="2.253087" steps="49370"/></proof>
+ </goal>
+ <goal name="typing_ghost_ghost_42" proved="true">
+ <proof prover="1"><result status="valid" time="0.232237" steps="5566"/></proof>
+ </goal>
+ <goal name="if_reg" proved="true">
+ <transf name="inline_all" proved="true" >
+  <goal name="if_reg.0" proved="true">
+  <proof prover="0"><result status="timeout" time="5.000000" steps="29270202"/></proof>
+  <proof prover="1"><result status="valid" time="2.011724" steps="93969"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="if_contaminated">
+ <transf name="inline_all" >
+  <goal name="if_contaminated.0">
+  <proof prover="0"><result status="timeout" time="5.000000" steps="42643524"/></proof>
+  <proof prover="1"><result status="timeout" time="5.000000" steps="157144"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="if_ghost_test">
+ </goal>
+ <goal name="typing_ex1">
+ </goal>
+ <goal name="let_reg_into_ghost">
+ </goal>
+</theory>
+<theory name="Subst" proved="true">
+ <goal name="subst_var" proved="true">
+ <proof prover="1"><result status="valid" time="0.014588" steps="114"/></proof>
+ </goal>
+ <goal name="subst_shadow" proved="true">
+ <proof prover="1"><result status="valid" time="0.019640" steps="265"/></proof>
+ </goal>
+</theory>
+<theory name="SemanticsExamples">
+ <goal name="values_var" proved="true">
+ <proof prover="1"><result status="valid" time="0.008722" steps="21"/></proof>
+ </goal>
+ <goal name="eval_1" proved="true">
+ <proof prover="1"><result status="valid" time="0.011404" steps="85"/></proof>
+ </goal>
+ <goal name="eval_42" proved="true">
+ <proof prover="1"><result status="valid" time="0.011838" steps="122"/></proof>
+ </goal>
+ <goal name="eval_ghost_42" proved="true">
+ <proof prover="1"><result status="valid" time="0.009210" steps="37"/></proof>
+ </goal>
+ <goal name="eval_if_true" proved="true">
+ <proof prover="1"><result status="valid" time="0.008774" steps="40"/></proof>
+ </goal>
+ <goal name="eval_ex1" proved="true">
+ <proof prover="1"><result status="valid" time="1.766647" steps="25589"/></proof>
+ </goal>
+ <goal name="eval_shadow">
+ <proof prover="0" timelimit="10" memlimit="4000"><result status="timeout" time="10.000000" steps="1563353"/></proof>
+ <proof prover="1" timelimit="10" memlimit="4000"><result status="timeout" time="10.000000" steps="101964"/></proof>
+ </goal>
+</theory>
+</file>
+</why3session>
