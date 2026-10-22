@@ -3,84 +3,113 @@
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="Z3" version="4.15.2" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Alt-Ergo" version="2.4.3" timelimit="5" steplimit="0" memlimit="1000"/>
-<file format="whyml">
+<prover id="1" name="Alt-Ergo" version="2.4.3" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.16.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
 <path name=".."/><path name="kidml.mlw"/>
-<theory name="TypingExamples">
- <goal name="atoms_const" proved="true">
- <proof prover="1"><result status="valid" time="0.013336" steps="167"/></proof>
- </goal>
- <goal name="atoms_var" proved="true">
- <proof prover="1"><result status="valid" time="0.016067" steps="149"/></proof>
- </goal>
- <goal name="atoms_unbound" proved="true">
- <proof prover="1"><result status="valid" time="0.011799" steps="90"/></proof>
- </goal>
- <goal name="typing_42" proved="true">
- <proof prover="1"><result status="valid" time="0.040337" steps="893"/></proof>
- </goal>
- <goal name="typing_ghost_42" proved="true">
- <proof prover="1"><result status="valid" time="0.230304" steps="5447"/></proof>
- </goal>
- <goal name="typing_ghost_pair" proved="true">
- <proof prover="1"><result status="valid" time="2.253087" steps="49370"/></proof>
- </goal>
- <goal name="typing_ghost_ghost_42" proved="true">
- <proof prover="1"><result status="valid" time="0.232237" steps="5566"/></proof>
- </goal>
- <goal name="if_reg" proved="true">
- <transf name="inline_all" proved="true" >
-  <goal name="if_reg.0" proved="true">
-  <proof prover="0"><result status="timeout" time="5.000000" steps="29270202"/></proof>
-  <proof prover="1"><result status="valid" time="2.011724" steps="93969"/></proof>
-  </goal>
- </transf>
- </goal>
- <goal name="if_contaminated">
- <transf name="inline_all" >
-  <goal name="if_contaminated.0">
-  <proof prover="0"><result status="timeout" time="5.000000" steps="42643524"/></proof>
-  <proof prover="1"><result status="timeout" time="5.000000" steps="157144"/></proof>
-  </goal>
- </transf>
- </goal>
- <goal name="if_ghost_test">
- </goal>
- <goal name="typing_ex1">
- </goal>
- <goal name="let_reg_into_ghost">
- </goal>
-</theory>
-<theory name="Subst" proved="true">
- <goal name="subst_var" proved="true">
- <proof prover="1"><result status="valid" time="0.014588" steps="114"/></proof>
- </goal>
- <goal name="subst_shadow" proved="true">
- <proof prover="1"><result status="valid" time="0.019640" steps="265"/></proof>
- </goal>
-</theory>
 <theory name="SemanticsExamples">
- <goal name="values_var" proved="true">
- <proof prover="1"><result status="valid" time="0.008722" steps="21"/></proof>
+ <goal name="values_var">
+ <proof prover="1"><result status="timeout" time="1.026334" steps="27520"/></proof>
+ <proof prover="2"><result status="timeout" time="1.000000" steps="2766301"/></proof>
  </goal>
- <goal name="eval_1" proved="true">
- <proof prover="1"><result status="valid" time="0.011404" steps="85"/></proof>
+ <goal name="eval_1">
+ <proof prover="1"><result status="valid" time="0.011404" steps="87"/></proof>
  </goal>
- <goal name="eval_42" proved="true">
- <proof prover="1"><result status="valid" time="0.011838" steps="122"/></proof>
+ <goal name="eval_42">
+ <proof prover="1"><result status="valid" time="0.011838" steps="132"/></proof>
  </goal>
- <goal name="eval_ghost_42" proved="true">
- <proof prover="1"><result status="valid" time="0.009210" steps="37"/></proof>
+ <goal name="eval_ghost_42">
+ <proof prover="1"><result status="valid" time="0.009210" steps="38"/></proof>
  </goal>
- <goal name="eval_if_true" proved="true">
- <proof prover="1"><result status="valid" time="0.008774" steps="40"/></proof>
+ <goal name="eval_if_true">
+ <proof prover="1"><result status="valid" time="0.008774" steps="41"/></proof>
  </goal>
- <goal name="eval_ex1" proved="true">
- <proof prover="1"><result status="valid" time="1.766647" steps="25589"/></proof>
+ <goal name="eval_ex1">
+ <proof prover="1"><result status="valid" time="0.947884" steps="14132"/></proof>
  </goal>
  <goal name="eval_shadow">
- <proof prover="0" timelimit="10" memlimit="4000"><result status="timeout" time="10.000000" steps="1563353"/></proof>
- <proof prover="1" timelimit="10" memlimit="4000"><result status="timeout" time="10.000000" steps="101964"/></proof>
+ <proof prover="1"><result status="timeout" time="1.000000" steps="13118"/></proof>
+ <proof prover="2"><result status="timeout" time="1.000000" steps="4814055"/></proof>
+ </goal>
+ <goal name="values_atoms_no_bar&#39;vc" expl="VC for values_atoms_no_bar">
+ <proof prover="1"><undone/></proof>
+ <proof prover="2"><undone/></proof>
+ </goal>
+</theory>
+<theory name="TypingExamples">
+ <goal name="atom_42">
+ <proof prover="1"><result status="valid" time="0.013972" steps="140"/></proof>
+ <proof prover="2" timelimit="5" obsolete="true"><result status="valid" time="0.006519" steps="15137"/></proof>
+ </goal>
+ <goal name="atoms_const">
+ <proof prover="1"><result status="valid" time="0.020068" steps="167"/></proof>
+ <proof prover="2" timelimit="5" obsolete="true"><result status="valid" time="0.041617" steps="191085"/></proof>
+ </goal>
+ <goal name="atoms_const_cons">
+ <proof prover="1"><result status="valid" time="0.019428" steps="167"/></proof>
+ </goal>
+ <goal name="atoms_var">
+ <proof prover="1"><result status="valid" time="0.016861" steps="153"/></proof>
+ </goal>
+ <goal name="typing_42">
+ <proof prover="1"><result status="valid" time="0.036142" steps="686"/></proof>
+ </goal>
+ <goal name="typing_ghost_42">
+ <proof prover="1"><result status="timeout" time="1.000000" steps="16775"/></proof>
+ <proof prover="2"><result status="timeout" time="1.000000" steps="5721994"/></proof>
+ <transf name="inline_all" >
+  <goal name="typing_ghost_42.0">
+  <proof prover="1" timelimit="5"><result status="timeout" time="5.000000" steps="94348"/></proof>
+  <proof prover="2" timelimit="5"><result status="timeout" time="5.000000" steps="31483687"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="typing_ghost_pair">
+ <transf name="assert" arg1="(typing empty_ctx (EAtoms (AVal (VConst (CInt 42)) :: (AVal (VConst (CBool true)) :: Nil))) ((Reg, TApp TInt Nil) :: ((Reg, TApp TBool Nil) :: Nil)))">
+  <goal name="typing_ghost_pair.0" expl="asserted formula">
+  <proof prover="1"><result status="valid" time="0.474239" steps="13260"/></proof>
+  </goal>
+  <goal name="typing_ghost_pair.1">
+  <proof prover="1"><result status="valid" time="0.016954" steps="66"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="typing_ghost_ghost_42">
+ <proof prover="0" obsolete="true"><result status="timeout" time="5.000000" steps="24698721"/></proof>
+ <proof prover="1"><result status="timeout" time="1.000000" steps="16805"/></proof>
+ <proof prover="2"><result status="timeout" time="1.000000" steps="6179099"/></proof>
+ </goal>
+ <goal name="if_reg">
+ <proof prover="1"><result status="timeout" time="1.000000" steps="30958"/></proof>
+ <proof prover="2"><result status="timeout" time="1.000000" steps="7156029"/></proof>
+ </goal>
+ <goal name="if_contaminated">
+ <proof prover="0" obsolete="true"><result status="timeout" time="5.000000" steps="92693412"/></proof>
+ <proof prover="1"><result status="timeout" time="1.000000" steps="19073"/></proof>
+ <proof prover="2"><result status="timeout" time="1.000000" steps="6929888"/></proof>
+ </goal>
+ <goal name="if_ghost_test">
+ <proof prover="0" obsolete="true"><result status="timeout" time="5.000000" steps="23395654"/></proof>
+ <proof prover="1"><result status="timeout" time="1.000000" steps="17287"/></proof>
+ <proof prover="2"><result status="timeout" time="1.000000" steps="6148405"/></proof>
+ </goal>
+ <goal name="typing_ex1">
+ <proof prover="0" obsolete="true"><result status="timeout" time="5.000000" steps="48465889"/></proof>
+ <proof prover="1"><result status="timeout" time="1.000000" steps="33220"/></proof>
+ <proof prover="2"><result status="timeout" time="1.000000" steps="4182035"/></proof>
+ </goal>
+ <goal name="let_reg_into_ghost">
+ <proof prover="0" obsolete="true"><result status="timeout" time="5.000000" steps="65164522"/></proof>
+ <proof prover="1"><result status="timeout" time="1.000000" steps="32423"/></proof>
+ <proof prover="2"><result status="timeout" time="1.000000" steps="5031910"/></proof>
+ </goal>
+</theory>
+<theory name="Subst">
+ <goal name="subst_var">
+ <proof prover="1" timelimit="5"><result status="valid" time="0.014588" steps="114"/></proof>
+ </goal>
+ <goal name="subst_shadow">
+ <proof prover="1" timelimit="5"><result status="valid" time="0.019640" steps="265"/></proof>
  </goal>
 </theory>
 </file>

@@ -85,6 +85,13 @@ module Masks
     | Cons b1 r1, Cons b2 r2 -> Cons (join_status b1 b2) (mask_union r1 r2)
     | _                      -> Nil  (* lengths differ: unused junk value *)
     end
+    
+  (* (TLet) helper *)
+  function binder_mask (bs : list (ghost_status, ident)) : mask =
+    match bs with
+    | Nil           -> Nil
+    | Cons (s, _) r -> Cons s (binder_mask r)
+    end
 
 end
 
@@ -174,47 +181,65 @@ module Typing
   use Syntax
   use Masks
   use Types
+  
+  (*
+  
+  
+  typing c (EAtoms [42]) [(Reg, Int)] has
+  two possible derivations?
+  
+  inductive typing (c : ctx) (e : expr) (p : pi) =
+  | t_const : forall c k.
+      typeof k = p -> typing c (EAtoms (AVal (VConst k) :: Nil)) ((Reg, p) :: Nil)
+  | t_var : forall c x t.
+      c[x] = Some t ->
+      typing c (EAtoms (AVar x :: Nil)) (t :: Nil)
+   
+  *)
 
-  (* (TConst) and (TVar): typing a single atom *)
-  function typing_atom (c : ctx) (a : atom) : option aty =
+  (* (TConst) and (TVar): typing a single atom *)   
+  
+
+   
+  inductive typing_atom (c : ctx) (a : atom) (t : aty) =
+    | t_const : forall c k t.
+        typeof k = t -> typing_atom c (AVal (VConst k)) (Reg, t)
+    | t_var   : forall c x t.
+        c[x] = Some t -> typing_atom c (AVar x) t
+  
+  (* 
+  
+  predicate typing_atom (c : ctx) (a : atom) (t : aty) =
     match a with
-    | AVal (VConst k) -> Some (Reg, typeof k)
-    | AVar x          -> c[x]
-    end
-
-  (* (TABar): typing a sequence of atoms, one atom at a time *)
-  function typing_atoms (c : ctx) (l : list atom) : option pi =
-    match l with
-    | Nil      -> Some Nil
-    | Cons a r ->
-        match typing_atom c a, typing_atoms c r with
-        | Some t, Some p -> Some (Cons t p)
-        | _              -> None
-        end
+    | AVal (VConst k) -> t = (Reg, typeof k)
+    | AVar x          -> c[x] = Some t
     end
     
-  (* (TLet) helper *)
-  function binder_mask (bs : list (ghost_status, ident)) : mask =
-    match bs with
-    | Nil           -> Nil
-    | Cons (s, _) r -> Cons s (binder_mask r)
+  *)
+  
+
+  (* (TABar) premise: typing a sequence of atoms, one atom at a time *)
+  predicate typing_atoms (c : ctx) (l : list atom) (p : pi) =
+    match l, p with
+    | Nil, Nil           -> true
+    | Cons a r, Cons t q -> typing_atom c a t /\ typing_atoms c r q
+    | _                  -> false    
     end
 
   (* typing judgment *)
   inductive typing (c : ctx) (e : expr) (p : pi) =
-    | t_atoms    : forall c l p.
-        typing_atoms c l = Some p -> typing c (EAtoms l) p
+    | t_abar     : forall c l p.
+        typing_atoms c l p -> typing c (EAtoms l) p
     | t_ghost    : forall c e p.
         typing c e p -> typing c (EGhost e) (ghostification p)
     | t_if       : forall c a e1 e2 p1 p2 p.
-        typing_atom c a = Some (Reg, TApp TBool Nil) ->
+        typing_atom c a (Reg, TApp TBool Nil) ->
         typing c e1 p1 ->
         typing c e2 p2 ->
         type_union p1 p2 = Some p ->
         typing c (EIf a e1 e2) p
-        (* length p = p1 /\ p2 *)
     | t_if_ghost : forall c a e1 e2 p1 p2 p.
-        typing_atom c a = Some (Ghost, TApp TBool Nil) ->
+        typing_atom c a (Ghost, TApp TBool Nil) ->
         typing c e1 p1 ->
         typing c e2 p2 ->
         type_union p1 p2 = Some p ->
@@ -222,7 +247,7 @@ module Typing
     | t_let : forall c bs e1 e2 p1 p2.
         typing c e1 p1 ->
         le_mask (mask_of p1) (binder_mask bs) ->
-        (* formalização em papel não precisa de tanto detalhe *)
+        (* formalization on paper doesn't need this much detail *)
         distinct (binder_names bs) ->
         typing (extend c bs (types_of p1)) e2 p2 ->
         typing c (ELet bs e1 e2) p2
@@ -242,16 +267,20 @@ module TypingExamples
   use Typing
 
   (* sanity checks for the typing of atoms and of sequences of atoms *)
+  goal atom_42:
+    typing_atom empty_ctx (AVal (VConst (CInt 42))) (Reg, TApp TInt Nil)
+    
   goal atoms_const:
     typing_atoms empty_ctx (AVal (VConst (CInt 42)) :: Nil)
-      = Some ((Reg, TApp TInt Nil) :: Nil)
+                           ((Reg, TApp TInt Nil) :: Nil)
+                           
+  goal atoms_const_cons:
+    typing_atoms empty_ctx (Cons (AVal (VConst (CInt 42))) Nil)
+                           (Cons (Reg, TApp TInt Nil) Nil)
 
   goal atoms_var:
-    typing_atoms empty_ctx["x" <- Some (Ghost, TApp TBool Nil)] (AVar "x" :: Nil)
-      = Some ((Ghost, TApp TBool Nil) :: Nil)
-
-  goal atoms_unbound:
-    typing_atoms empty_ctx (AVar "x" :: Nil) = None
+    typing_atoms empty_ctx["x" <- Some (Ghost, TApp TBool Nil)]
+                 (AVar "x" :: Nil) ((Ghost, TApp TBool Nil) :: Nil)
 
   goal typing_42:
     typing empty_ctx (EAtoms (AVal (VConst (CInt 42)) :: Nil))
@@ -304,6 +333,7 @@ module TypingExamples
       ((Ghost, TApp TInt Nil) :: Nil)
 
   (* 
+  
   goal distinct_names: "x" <> "y"
 
   goal lookup_other:
@@ -377,22 +407,18 @@ module Semantics
   use Syntax
   use Subst
   
-  (* the values among a list of atoms *)
-  function atoms_values (l : list atom) : option (list value) =
-    match l with
-    | Nil             -> Some Nil
-    | Cons (AVal v) r ->
-        match atoms_values r with
-        | Some vs -> Some (Cons v vs)
-        | None    -> None
-        end
-    | Cons (AVar _) _ -> None
-    end 
+  (* vbar viewed as an atom sequence *)
+  function values_atoms (vs : list value) : list atom =
+    match vs with
+    | Nil      -> Nil
+    | Cons v r -> Cons (AVal v) (values_atoms r)
+    end
   
   (* evaluation judgment *)  
   inductive eval (e : expr) (vs : list value) =
+    (* forall vs. eval (EAtoms (values_atoms vs)) vs *)
     | eval_vbar     : forall l vs.
-        atoms_values l = Some vs -> eval (EAtoms l) vs
+        l = values_atoms vs -> eval (EAtoms l) vs
     | eval_ghost    : forall e vs.
         eval e vs  -> eval (EGhost e) vs
     | eval_if_true  : forall e1 e2 vs.
@@ -413,14 +439,15 @@ module SemanticsExamples
 
   use int.Int
   use list.List
+  use list.Mem
   use option.Option
   use Notation
   use Syntax
   use Semantics
 
-  (* a variable among the atoms blocks evaluation *)
+  (* no list of values produces an atom sequence containing a variable *)   
   goal values_var:
-    atoms_values (AVal (VConst (CInt 1)) :: (AVar "x" :: Nil)) = None
+    forall vs. not (mem (AVar "x") (values_atoms vs))
 
   (* (EvalVBar) *)
   lemma eval_1:
@@ -451,4 +478,4 @@ module SemanticsExamples
              (EAtoms (AVar "x" :: Nil))))
          (VConst (CInt 42) :: Nil)
 
-end
+0endhost
