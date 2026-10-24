@@ -283,6 +283,7 @@ module TypingExamples
            (EAtoms (AVal (VConst (CInt 2)) :: Nil)))
       ((Ghost, TApp TInt Nil) :: Nil)
 
+  (* sanity checks for the typing of let..in expressions *)
   goal typing_ex1:
     typing empty_ctx ex1 ((Ghost, TApp TInt Nil) :: Nil)
 
