@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"https://www.why3.org/why3session.dtd">
+<why3session shape_version="6">
+<prover id="0" name="Z3" version="4.16.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="2.4.3" timelimit="1" steplimit="0" memlimit="1000"/>
+<file format="whyml">
+<path name=".."/><path name="predicate.mlw"/>
+<theory name="TypingExamples">
+ <goal name="atom_42" proved="true">
+ <proof prover="1"><result status="valid" time="0.015431" steps="140"/></proof>
+ </goal>
+ <goal name="atoms_const" proved="true">
+ <proof prover="1"><result status="valid" time="0.015962" steps="167"/></proof>
+ </goal>
+ <goal name="atoms_const_cons" proved="true">
+ <proof prover="1"><result status="valid" time="0.014638" steps="167"/></proof>
+ </goal>
+ <goal name="atoms_var" proved="true">
+ <proof prover="1"><result status="valid" time="0.013621" steps="153"/></proof>
+ </goal>
+ <goal name="typing_42" proved="true">
+ <proof prover="1"><result status="valid" time="0.033232" steps="683"/></proof>
+ </goal>
+ <goal name="typing_ghost_42">
+ <proof prover="0"><result status="timeout" time="1.000000" steps="8127096"/></proof>
+ <proof prover="1"><result status="timeout" time="1.000000" steps="39398"/></proof>
+ </goal>
+ <goal name="typing_ghost_pair">
+ <proof prover="0"><result status="timeout" time="1.000000" steps="10660033"/></proof>
+ <proof prover="1"><result status="timeout" time="1.000000" steps="32294"/></proof>
+ </goal>
+ <goal name="typing_ghost_ghost_42">
+ <proof prover="0"><result status="timeout" time="1.000000" steps="9698419"/></proof>
+ <proof prover="1"><result status="timeout" time="1.000000" steps="33405"/></proof>
+ </goal>
+ <goal name="if_reg">
+ <proof prover="0"><result status="timeout" time="1.000000" steps="7303643"/></proof>
+ <proof prover="1"><result status="timeout" time="1.000000" steps="36530"/></proof>
+ </goal>
+ <goal name="if_contaminated">
+ <proof prover="0"><result status="timeout" time="1.000000" steps="6953120"/></proof>
+ <proof prover="1"><result status="timeout" time="1.000000" steps="30953"/></proof>
+ </goal>
+ <goal name="if_ghost_test">
+ <proof prover="0"><result status="timeout" time="1.000000" steps="7615130"/></proof>
+ <proof prover="1"><result status="timeout" time="1.000000" steps="35769"/></proof>
+ </goal>
+ <goal name="typing_ex1">
+ <proof prover="0"><result status="timeout" time="1.000000" steps="9440343"/></proof>
+ <proof prover="1"><result status="timeout" time="1.000000" steps="36541"/></proof>
+ </goal>
+ <goal name="let_reg_into_ghost">
+ <proof prover="0"><result status="timeout" time="1.000000" steps="5130427"/></proof>
+ <proof prover="1"><result status="timeout" time="1.000000" steps="37027"/></proof>
+ </goal>
+</theory>
+<theory name="Subst">
+ <goal name="subst_var">
+ </goal>
+ <goal name="subst_shadow">
+ </goal>
+</theory>
+<theory name="SemanticsExamples">
+ <goal name="values_var">
+ <proof prover="0"><result status="timeout" time="1.000000" steps="3555470"/></proof>
+ <proof prover="1"><result status="timeout" time="1.000000" steps="27908"/></proof>
+ </goal>
+ <goal name="eval_1" proved="true">
+ <proof prover="1"><result status="valid" time="0.015936" steps="87"/></proof>
+ </goal>
+ <goal name="eval_42" proved="true">
+ <proof prover="1"><result status="valid" time="0.014633" steps="132"/></proof>
+ </goal>
+ <goal name="eval_ghost_42" proved="true">
+ <proof prover="1"><result status="valid" time="0.010576" steps="38"/></proof>
+ </goal>
+ <goal name="eval_if_true" proved="true">
+ <proof prover="1"><result status="valid" time="0.009925" steps="41"/></proof>
+ </goal>
+ <goal name="eval_ex1">
+ <proof prover="0"><result status="timeout" time="1.000000" steps="4717647"/></proof>
+ <proof prover="1"><result status="timeout" time="1.000000" steps="13991"/></proof>
+ </goal>
+ <goal name="eval_shadow">
+ <proof prover="0"><result status="timeout" time="1.000000" steps="5122025"/></proof>
+ <proof prover="1"><result status="timeout" time="1.000000" steps="14560"/></proof>
+ </goal>
+</theory>
+</file>
+</why3session>

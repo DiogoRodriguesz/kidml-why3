@@ -199,8 +199,6 @@ module Typing
 
   (* (TConst) and (TVar): typing a single atom *)   
   
-
-   
   inductive typing_atom (c : ctx) (a : atom) (t : aty) =
     | t_const : forall c k t.
         typeof k = t -> typing_atom c (AVal (VConst k)) (Reg, t)
@@ -251,6 +249,9 @@ module Typing
         distinct (binder_names bs) ->
         typing (extend c bs (types_of p1)) e2 p2 ->
         typing c (ELet bs e1 e2) p2
+        
+  goal atom_42:
+    typing_atom empty_ctx (AVal (VConst (CInt 42))) (Reg, TApp TInt Nil)
 
 end
 
@@ -413,7 +414,7 @@ module Semantics
     | Nil      -> Nil
     | Cons v r -> Cons (AVal v) (values_atoms r)
     end
-  
+    
   (* evaluation judgment *)  
   inductive eval (e : expr) (vs : list value) =
     (* forall vs. eval (EAtoms (values_atoms vs)) vs *)
@@ -478,4 +479,4 @@ module SemanticsExamples
              (EAtoms (AVar "x" :: Nil))))
          (VConst (CInt 42) :: Nil)
 
-0endhost
+end

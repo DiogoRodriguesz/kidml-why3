@@ -1,0 +1,436 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"https://www.why3.org/why3session.dtd">
+<why3session shape_version="6">
+<prover id="0" name="Z3" version="5.1.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="2.4.3" timelimit="1" steplimit="0" memlimit="1000"/>
+<file format="whyml">
+<path name=".."/><path name="inductive.mlw"/>
+<theory name="TypingExamples" proved="true">
+ <goal name="atom_42" proved="true">
+ <proof prover="0"><result status="valid" time="0.044810" steps="246573"/></proof>
+ </goal>
+ <goal name="atoms_const" proved="true">
+ <transf name="compute" proved="true" >
+  <goal name="atoms_const.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.033552" steps="201894"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="atoms_var" proved="true">
+ <proof prover="2"><result status="valid" time="0.009853" steps="72"/></proof>
+ </goal>
+ <goal name="typing_42" proved="true">
+ <transf name="apply" proved="true" arg1="t_abar">
+  <goal name="typing_42.0" expl="apply premises" proved="true">
+  <transf name="compute" proved="true" >
+   <goal name="typing_42.0.0" expl="apply premises" proved="true">
+   <proof prover="0"><result status="valid" time="0.034838" steps="201894"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="typing_ghost_42" proved="true">
+ <transf name="assert" proved="true" arg1="ghostification ((Reg, TApp TInt Nil) :: Nil) = (Ghost, TApp TInt Nil) :: Nil">
+  <goal name="typing_ghost_42.0" expl="asserted formula" proved="true">
+  <transf name="compute" proved="true" >
+  </transf>
+  </goal>
+  <goal name="typing_ghost_42.1" proved="true">
+  <transf name="assert" proved="true" arg1="typing empty_ctx (EAtoms (AVal (VConst (CInt 42)) :: Nil)) ((Reg, TApp TInt Nil) :: Nil)">
+   <goal name="typing_ghost_42.1.0" expl="asserted formula" proved="true">
+   <transf name="apply" proved="true" arg1="t_abar">
+    <goal name="typing_ghost_42.1.0.0" expl="apply premises" proved="true">
+    <transf name="compute" proved="true" >
+     <goal name="typing_ghost_42.1.0.0.0" expl="apply premises" proved="true">
+     <transf name="apply" proved="true" arg1="t_const">
+      <goal name="typing_ghost_42.1.0.0.0.0" expl="apply premises" proved="true">
+      <proof prover="2"><result status="valid" time="0.014423" steps="72"/></proof>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="typing_ghost_42.1.1" proved="true">
+   <proof prover="2"><result status="valid" time="0.017066" steps="42"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="typing_ghost_pair" proved="true">
+ <transf name="assert" proved="true" arg1="ghostification ((Reg, TApp TInt Nil) :: ((Reg, TApp TBool Nil) :: Nil)) = (Ghost, TApp TInt Nil) :: ((Ghost, TApp TBool Nil) :: Nil)">
+  <goal name="typing_ghost_pair.0" expl="asserted formula" proved="true">
+  <transf name="compute" proved="true" >
+  </transf>
+  </goal>
+  <goal name="typing_ghost_pair.1" proved="true">
+  <transf name="assert" proved="true" arg1="typing empty_ctx (EAtoms (AVal (VConst (CInt 42)) :: (AVal (VConst (CBool true)) :: Nil))) ((Reg, TApp TInt Nil) :: ((Reg, TApp TBool Nil) :: Nil))">
+   <goal name="typing_ghost_pair.1.0" expl="asserted formula" proved="true">
+   <transf name="apply" proved="true" arg1="t_abar">
+    <goal name="typing_ghost_pair.1.0.0" expl="apply premises" proved="true">
+    <transf name="compute" proved="true" >
+     <goal name="typing_ghost_pair.1.0.0.0" expl="apply premises" proved="true">
+     <transf name="split_vc" proved="true" >
+      <goal name="typing_ghost_pair.1.0.0.0.0" proved="true">
+      <transf name="apply" proved="true" arg1="t_const">
+       <goal name="typing_ghost_pair.1.0.0.0.0.0" expl="apply premises" proved="true">
+       <proof prover="2"><result status="valid" time="0.018359" steps="119"/></proof>
+       </goal>
+      </transf>
+      </goal>
+      <goal name="typing_ghost_pair.1.0.0.0.1" proved="true">
+      <transf name="apply" proved="true" arg1="t_const">
+       <goal name="typing_ghost_pair.1.0.0.0.1.0" expl="apply premises" proved="true">
+       <proof prover="2"><result status="valid" time="0.018363" steps="117"/></proof>
+       </goal>
+      </transf>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="typing_ghost_pair.1.1" proved="true">
+   <proof prover="2"><result status="valid" time="0.017678" steps="54"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="typing_ghost_ghost_42" proved="true">
+ <transf name="assert" proved="true" arg1="typing empty_ctx (EGhost (EAtoms (AVal (VConst (CInt 42)) :: Nil))) ((Ghost, TApp TInt Nil) :: Nil)">
+  <goal name="typing_ghost_ghost_42.0" expl="asserted formula" proved="true">
+  <transf name="assert" proved="true" arg1="ghostification ((Reg, TApp TInt Nil) :: Nil) = ((Ghost, TApp TInt Nil) :: Nil)">
+   <goal name="typing_ghost_ghost_42.0.0" expl="asserted formula" proved="true">
+   <transf name="compute" proved="true" >
+   </transf>
+   </goal>
+   <goal name="typing_ghost_ghost_42.0.1" expl="asserted formula" proved="true">
+   <transf name="assert" proved="true" arg1="typing empty_ctx (EAtoms (AVal (VConst (CInt 42)) :: Nil)) ((Reg, TApp TInt Nil) :: Nil)">
+    <goal name="typing_ghost_ghost_42.0.1.0" expl="asserted formula" proved="true">
+    <transf name="apply" proved="true" arg1="t_abar">
+     <goal name="typing_ghost_ghost_42.0.1.0.0" expl="apply premises" proved="true">
+     <transf name="compute" proved="true" >
+      <goal name="typing_ghost_ghost_42.0.1.0.0.0" expl="apply premises" proved="true">
+      <transf name="apply" proved="true" arg1="t_const">
+       <goal name="typing_ghost_ghost_42.0.1.0.0.0.0" expl="apply premises" proved="true">
+       <proof prover="2"><result status="valid" time="0.014408" steps="72"/></proof>
+       </goal>
+      </transf>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+    <goal name="typing_ghost_ghost_42.0.1.1" expl="asserted formula" proved="true">
+    <proof prover="2"><result status="valid" time="0.016643" steps="42"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="typing_ghost_ghost_42.1" proved="true">
+  <transf name="assert" proved="true" arg1="ghostification ((Ghost, TApp TInt Nil) :: Nil) = (Ghost, TApp TInt Nil) :: Nil">
+   <goal name="typing_ghost_ghost_42.1.0" expl="asserted formula" proved="true">
+   <transf name="compute" proved="true" >
+   </transf>
+   </goal>
+   <goal name="typing_ghost_ghost_42.1.1" proved="true">
+   <proof prover="2"><result status="valid" time="0.019140" steps="40"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="if_reg" proved="true">
+ <transf name="apply" proved="true" arg1="t_if" arg2="with" arg3="((Reg, TApp TInt Nil) :: Nil), ((Reg, TApp TInt Nil) :: Nil)">
+  <goal name="if_reg.0" expl="apply premises" proved="true">
+  <transf name="apply" proved="true" arg1="t_const">
+   <goal name="if_reg.0.0" expl="apply premises" proved="true">
+   <proof prover="2"><result status="valid" time="0.012048" steps="34"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="if_reg.1" expl="apply premises" proved="true">
+  <transf name="apply" proved="true" arg1="t_abar">
+   <goal name="if_reg.1.0" expl="apply premises" proved="true">
+   <transf name="compute" proved="true" >
+    <goal name="if_reg.1.0.0" expl="apply premises" proved="true">
+    <proof prover="0"><result status="valid" time="0.033566" steps="193169"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="if_reg.2" expl="apply premises" proved="true">
+  <transf name="apply" proved="true" arg1="t_abar">
+   <goal name="if_reg.2.0" expl="apply premises" proved="true">
+   <transf name="compute" proved="true" >
+    <goal name="if_reg.2.0.0" expl="apply premises" proved="true">
+    <proof prover="0"><result status="valid" time="0.036032" steps="201894"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="if_reg.3" expl="apply premises" proved="true">
+  <transf name="compute" proved="true" >
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="if_contaminated" proved="true">
+ <transf name="apply" proved="true" arg1="t_if" arg2="with" arg3="((Ghost, TApp TInt Nil) :: Nil), ((Reg, TApp TInt Nil) :: Nil)">
+  <goal name="if_contaminated.0" expl="apply premises" proved="true">
+  <transf name="apply" proved="true" arg1="t_const">
+   <goal name="if_contaminated.0.0" expl="apply premises" proved="true">
+   <proof prover="2"><result status="valid" time="0.014158" steps="34"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="if_contaminated.1" expl="apply premises" proved="true">
+  <transf name="assert" proved="true" arg1="ghostification ((Reg, TApp TInt Nil) :: Nil) = (Ghost, TApp TInt Nil) :: Nil">
+   <goal name="if_contaminated.1.0" expl="asserted formula" proved="true">
+   <transf name="compute" proved="true" >
+   </transf>
+   </goal>
+   <goal name="if_contaminated.1.1" expl="apply premises" proved="true">
+   <transf name="assert" proved="true" arg1="typing empty_ctx (EAtoms (AVal (VConst (CInt 1)) :: Nil)) ((Reg, TApp TInt Nil) :: Nil)">
+    <goal name="if_contaminated.1.1.0" expl="asserted formula" proved="true">
+    <transf name="apply" proved="true" arg1="t_abar">
+     <goal name="if_contaminated.1.1.0.0" expl="apply premises" proved="true">
+     <transf name="compute" proved="true" >
+      <goal name="if_contaminated.1.1.0.0.0" expl="apply premises" proved="true">
+      <transf name="apply" proved="true" arg1="t_const">
+       <goal name="if_contaminated.1.1.0.0.0.0" expl="apply premises" proved="true">
+       <transf name="compute" proved="true" >
+       </transf>
+       </goal>
+      </transf>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+    <goal name="if_contaminated.1.1.1" expl="apply premises" proved="true">
+    <proof prover="2"><result status="valid" time="0.017329" steps="42"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="if_contaminated.2" expl="apply premises" proved="true">
+  <transf name="apply" proved="true" arg1="t_abar">
+   <goal name="if_contaminated.2.0" expl="apply premises" proved="true">
+   <transf name="compute" proved="true" >
+    <goal name="if_contaminated.2.0.0" expl="apply premises" proved="true">
+    <transf name="apply" proved="true" arg1="t_const">
+     <goal name="if_contaminated.2.0.0.0" expl="apply premises" proved="true">
+     <transf name="compute" proved="true" >
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="if_contaminated.3" expl="apply premises" proved="true">
+  <transf name="compute" proved="true" >
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="if_ghost_test" proved="true">
+ <transf name="replace" proved="true" arg1="((Ghost, TApp TInt Nil) :: Nil)" arg2="(ghostification ((Reg, TApp TInt Nil) :: Nil))">
+  <goal name="if_ghost_test.0" proved="true">
+  <transf name="apply" proved="true" arg1="t_if_ghost" arg2="with" arg3="((Reg, TApp TInt Nil) :: Nil), ((Reg, TApp TInt Nil) :: Nil)">
+   <goal name="if_ghost_test.0.0" expl="apply premises" proved="true">
+   <transf name="apply" proved="true" arg1="t_var">
+    <goal name="if_ghost_test.0.0.0" expl="apply premises" proved="true">
+    <proof prover="2"><result status="valid" time="0.010964" steps="8"/></proof>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="if_ghost_test.0.1" expl="apply premises" proved="true">
+   <transf name="apply" proved="true" arg1="t_abar">
+    <goal name="if_ghost_test.0.1.0" expl="apply premises" proved="true">
+    <transf name="compute" proved="true" >
+     <goal name="if_ghost_test.0.1.0.0" expl="apply premises" proved="true">
+     <transf name="apply" proved="true" arg1="t_const">
+      <goal name="if_ghost_test.0.1.0.0.0" expl="apply premises" proved="true">
+      <transf name="compute" proved="true" >
+      </transf>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="if_ghost_test.0.2" expl="apply premises" proved="true">
+   <transf name="apply" proved="true" arg1="t_abar">
+    <goal name="if_ghost_test.0.2.0" expl="apply premises" proved="true">
+    <transf name="compute" proved="true" >
+     <goal name="if_ghost_test.0.2.0.0" expl="apply premises" proved="true">
+     <transf name="apply" proved="true" arg1="t_const">
+      <goal name="if_ghost_test.0.2.0.0.0" expl="apply premises" proved="true">
+      <transf name="compute" proved="true" >
+      </transf>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="if_ghost_test.0.3" expl="apply premises" proved="true">
+   <transf name="compute" proved="true" >
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="if_ghost_test.1" expl="equality hypothesis" proved="true">
+  <transf name="compute" proved="true" >
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="typing_ex1" proved="true">
+ <transf name="unfold" proved="true" arg1="ex1">
+  <goal name="typing_ex1.0" proved="true">
+  <transf name="apply" proved="true" arg1="t_let" arg2="with" arg3="((Reg, TApp TInt Nil) :: Nil)">
+   <goal name="typing_ex1.0.0" expl="apply premises" proved="true">
+   <transf name="apply" proved="true" arg1="t_abar">
+    <goal name="typing_ex1.0.0.0" expl="apply premises" proved="true">
+    <transf name="compute" proved="true" >
+     <goal name="typing_ex1.0.0.0.0" expl="apply premises" proved="true">
+     <transf name="apply" proved="true" arg1="t_const">
+      <goal name="typing_ex1.0.0.0.0.0" expl="apply premises" proved="true">
+      <transf name="compute" proved="true" >
+      </transf>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="typing_ex1.0.1" expl="apply premises" proved="true">
+   <transf name="compute" proved="true" >
+   </transf>
+   </goal>
+   <goal name="typing_ex1.0.2" expl="apply premises" proved="true">
+   <transf name="compute" proved="true" >
+   </transf>
+   </goal>
+   <goal name="typing_ex1.0.3" expl="apply premises" proved="true">
+   <transf name="compute" proved="true" >
+    <goal name="typing_ex1.0.3.0" expl="apply premises" proved="true">
+    <transf name="replace" proved="true" arg1="(Cons (Ghost, TApp TInt Nil) Nil)" arg2="(ghostification (Cons (Reg, TApp TInt Nil) Nil))">
+     <goal name="typing_ex1.0.3.0.0" expl="apply premises" proved="true">
+     <transf name="apply" proved="true" arg1="t_ghost">
+      <goal name="typing_ex1.0.3.0.0.0" expl="apply premises" proved="true">
+      <transf name="apply" proved="true" arg1="t_abar">
+       <goal name="typing_ex1.0.3.0.0.0.0" expl="apply premises" proved="true">
+       <transf name="compute" proved="true" >
+        <goal name="typing_ex1.0.3.0.0.0.0.0" expl="apply premises" proved="true">
+        <transf name="apply" proved="true" arg1="t_var">
+         <goal name="typing_ex1.0.3.0.0.0.0.0.0" expl="apply premises" proved="true">
+         <transf name="compute" proved="true" >
+         </transf>
+         </goal>
+        </transf>
+        </goal>
+       </transf>
+       </goal>
+      </transf>
+      </goal>
+     </transf>
+     </goal>
+     <goal name="typing_ex1.0.3.0.1" expl="equality hypothesis" proved="true">
+     <transf name="compute" proved="true" >
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="let_reg_into_ghost" proved="true">
+ <transf name="apply" proved="true" arg1="t_let" arg2="with" arg3="((Reg, TApp TInt Nil) :: Nil)">
+  <goal name="let_reg_into_ghost.0" expl="apply premises" proved="true">
+  <transf name="apply" proved="true" arg1="t_abar">
+   <goal name="let_reg_into_ghost.0.0" expl="apply premises" proved="true">
+   <transf name="compute" proved="true" >
+    <goal name="let_reg_into_ghost.0.0.0" expl="apply premises" proved="true">
+    <transf name="apply" proved="true" arg1="t_const">
+     <goal name="let_reg_into_ghost.0.0.0.0" expl="apply premises" proved="true">
+     <transf name="compute" proved="true" >
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="let_reg_into_ghost.1" expl="apply premises" proved="true">
+  <transf name="compute" proved="true" >
+  </transf>
+  </goal>
+  <goal name="let_reg_into_ghost.2" expl="apply premises" proved="true">
+  <transf name="compute" proved="true" >
+  </transf>
+  </goal>
+  <goal name="let_reg_into_ghost.3" expl="apply premises" proved="true">
+  <transf name="apply" proved="true" arg1="t_abar">
+   <goal name="let_reg_into_ghost.3.0" expl="apply premises" proved="true">
+   <transf name="compute" proved="true" >
+    <goal name="let_reg_into_ghost.3.0.0" expl="apply premises" proved="true">
+    <transf name="apply" proved="true" arg1="t_var">
+     <goal name="let_reg_into_ghost.3.0.0.0" expl="apply premises" proved="true">
+     <transf name="compute" proved="true" >
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Subst">
+ <goal name="subst_var">
+ </goal>
+ <goal name="subst_shadow">
+ </goal>
+</theory>
+<theory name="SemanticsExamples">
+ <goal name="values_var">
+ </goal>
+ <goal name="eval_1">
+ </goal>
+ <goal name="eval_42">
+ </goal>
+ <goal name="eval_ghost_42">
+ </goal>
+ <goal name="eval_if_true">
+ </goal>
+ <goal name="eval_ex1">
+ </goal>
+ <goal name="eval_shadow">
+ </goal>
+</theory>
+</file>
+</why3session>
