@@ -435,10 +435,10 @@ module SemanticsExamples
     forall vs. not (mem (AVar "x") (values_atoms vs))
 
   (* (EvalVBar) *)
-  lemma eval_1:
+  goal eval_1:
     eval (EAtoms (AVal (VConst (CInt 1)) :: Nil)) (VConst (CInt 1) :: Nil)
 
-  lemma eval_42:
+  goal eval_42:
     eval (EAtoms (AVal (VConst (CInt 42)) :: Nil)) (VConst (CInt 42) :: Nil)
 
   (* (EvalGhost): ghost has no effect on execution *)

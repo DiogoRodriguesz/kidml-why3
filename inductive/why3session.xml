@@ -3,8 +3,9 @@
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="Z3" version="5.1.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC5" version="" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.4.3" timelimit="1" steplimit="0" memlimit="1000"/>
-<file format="whyml">
+<file format="whyml" proved="true">
 <path name=".."/><path name="inductive.mlw"/>
 <theory name="TypingExamples" proved="true">
  <goal name="atom_42" proved="true">
@@ -410,26 +411,64 @@
  </transf>
  </goal>
 </theory>
-<theory name="Subst">
- <goal name="subst_var">
+<theory name="Subst" proved="true">
+ <goal name="subst_var" proved="true">
+ <proof prover="2"><result status="valid" time="0.018336" steps="113"/></proof>
  </goal>
- <goal name="subst_shadow">
+ <goal name="subst_shadow" proved="true">
+ <proof prover="2"><result status="valid" time="0.022634" steps="263"/></proof>
  </goal>
 </theory>
-<theory name="SemanticsExamples">
- <goal name="values_var">
+<theory name="SemanticsExamples" proved="true">
+ <goal name="values_var" proved="true">
+ <transf name="induction_ty_lex" proved="true" >
+  <goal name="values_var.0" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="values_var.0.0" proved="true">
+   <proof prover="2"><result status="valid" time="0.010398" steps="18"/></proof>
+   </goal>
+   <goal name="values_var.0.1" proved="true">
+   <proof prover="2"><result status="valid" time="0.015324" steps="46"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
  </goal>
- <goal name="eval_1">
+ <goal name="eval_1" proved="true">
+ <proof prover="2"><result status="valid" time="0.013943" steps="87"/></proof>
  </goal>
- <goal name="eval_42">
+ <goal name="eval_42" proved="true">
+ <proof prover="2"><result status="valid" time="0.013624" steps="87"/></proof>
  </goal>
- <goal name="eval_ghost_42">
+ <goal name="eval_ghost_42" proved="true">
+ <proof prover="2"><result status="valid" time="0.010108" steps="94"/></proof>
  </goal>
- <goal name="eval_if_true">
+ <goal name="eval_if_true" proved="true">
+ <proof prover="2"><result status="valid" time="0.010328" steps="136"/></proof>
  </goal>
- <goal name="eval_ex1">
+ <goal name="eval_ex1" proved="true">
+ <proof prover="1" obsolete="true"><result status="valid" time="0.216944" steps="83990"/></proof>
+ <proof prover="2"><result status="valid" time="0.815972" steps="11935"/></proof>
  </goal>
- <goal name="eval_shadow">
+ <goal name="eval_shadow" proved="true">
+ <transf name="apply" proved="true" arg1="eval_let" arg2="with" arg3="(VConst (CInt 1) :: Nil)">
+  <goal name="eval_shadow.0" expl="apply premises" proved="true">
+  <proof prover="2"><result status="valid" time="0.020710" steps="87"/></proof>
+  </goal>
+  <goal name="eval_shadow.1" expl="apply premises" proved="true">
+  <proof prover="2"><result status="valid" time="0.012989" steps="30"/></proof>
+  </goal>
+  <goal name="eval_shadow.2" expl="apply premises" proved="true">
+  <proof prover="2"><result status="valid" time="0.014110" steps="77"/></proof>
+  </goal>
+  <goal name="eval_shadow.3" expl="apply premises" proved="true">
+  <transf name="compute" proved="true" >
+   <goal name="eval_shadow.3.0" expl="apply premises" proved="true">
+   <proof prover="2"><result status="valid" time="0.727910" steps="11651"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
  </goal>
 </theory>
 </file>
