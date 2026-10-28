@@ -375,8 +375,9 @@ module Semantics
     | Nil      -> Nil
     | Cons v r -> Cons (AVal v) (values_atoms r)
     end
-  
-  (*
+ 
+ 
+  (* 
    
   predicate eval (e: expr) (vs : list value) =
     match e with
@@ -391,13 +392,8 @@ module Semantics
           distinct (binder_names bs) /\
           eval (subst_all (binder_names bs) vs1 e2) vs
     end
-          
-        (* i can't implement this rule without a “fuel” parameter, since it 
-            involves a recursion that isn't structurally smaller.
-            (eval (subst_all (binder_names bs) vs1 e2) vs) *)
-    
-    *)   
 
+  *)
   
   (* evaluation judgment *)  
   inductive eval (e : expr) (vs : list value) =
