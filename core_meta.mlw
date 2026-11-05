@@ -173,6 +173,16 @@ module Types
     | Nil           -> Nil
     | Cons (_, t) r -> Cons t (types_of r)
     end
+    
+  (* projection of value *)
+  function typeof_value (v : value) : ty =
+    match v with 
+      VConst k -> typeof k 
+    end
+  
+  (* same types, and q is at most as ghost as p *)
+  predicate le_pi (q p : pi) =
+    types_of q = types_of p /\ le_mask (mask_of q) (mask_of p)
 
   (* type ghostification *)
   function ghostification (p : pi) : pi =
@@ -252,95 +262,6 @@ module Typing
   
 end
 
-(* sanity checks for typing *)
-module TypingExamples
-
-  use int.Int
-  use list.List
-  use map.Map
-  use option.Option
-  use Notation
-  use Syntax
-  use Types
-  use Typing
-
-  (* sanity checks for the typing of atoms and of sequences of atoms *)
-  goal atom_42:
-    typing_atom empty_ctx (AVal (VConst (CInt 42))) (Reg, TApp TInt Nil)
-    
-  goal atoms_const:
-    typing_atoms empty_ctx (AVal (VConst (CInt 42)) :: Nil)
-                           ((Reg, TApp TInt Nil) :: Nil)
-
-  goal atoms_var:
-    typing_atoms empty_ctx["x" <- Some (Ghost, TApp TBool Nil)]
-                 (AVar "x" :: Nil) ((Ghost, TApp TBool Nil) :: Nil)
-
-  goal typing_42:
-    typing empty_ctx (EAtoms (AVal (VConst (CInt 42)) :: Nil))
-                     ((Reg, TApp TInt Nil) :: Nil)
-
-  (* sanity checks for the typing of ghost expressions *)
-  goal typing_ghost_42:
-    typing empty_ctx (EGhost (EAtoms (AVal (VConst (CInt 42)) :: Nil)))
-                     ((Ghost, TApp TInt Nil) :: Nil)                  
- 
-  goal typing_ghost_pair:
-    typing empty_ctx
-      (EGhost (EAtoms (AVal (VConst (CInt 42)) :: (AVal (VConst (CBool true)) :: Nil))))
-      ((Ghost, TApp TInt Nil) :: ((Ghost, TApp TBool Nil) :: Nil))
-
-  goal typing_ghost_ghost_42:
-    typing empty_ctx (EGhost (EGhost (EAtoms (AVal (VConst (CInt 42)) :: Nil))))
-                     ((Ghost, TApp TInt Nil) :: Nil)
-
-  (* sanity checks for the typing of if..then..else expressions *)
-  goal if_reg:
-    typing empty_ctx
-      (EIf (AVal (VConst (CBool true)))
-           (EAtoms (AVal (VConst (CInt 1)) :: Nil))
-           (EAtoms (AVal (VConst (CInt 2)) :: Nil)))
-      ((Reg, TApp TInt Nil) :: Nil)
-
-  goal if_contaminated:
-    typing empty_ctx
-      (EIf (AVal (VConst (CBool true)))
-           (EGhost (EAtoms (AVal (VConst (CInt 1)) :: Nil)))
-           (EAtoms (AVal (VConst (CInt 2)) :: Nil)))
-      ((Ghost, TApp TInt Nil) :: Nil)
-
-  goal if_ghost_test:
-    typing (empty_ctx["x" <- Some (Ghost, TApp TBool Nil)])
-      (EIf (AVar "x")
-           (EAtoms (AVal (VConst (CInt 1)) :: Nil))
-           (EAtoms (AVal (VConst (CInt 2)) :: Nil)))
-      ((Ghost, TApp TInt Nil) :: Nil)
-
-  (* sanity checks for the typing of let..in expressions *)
-  goal typing_ex1:
-    typing empty_ctx ex1 ((Ghost, TApp TInt Nil) :: Nil)
-
-  goal let_reg_into_ghost:
-    typing empty_ctx
-      (ELet ((Ghost, "x") :: Nil)
-            (EAtoms (AVal (VConst (CInt 42)) :: Nil))
-            (EAtoms (AVar "x" :: Nil)))
-      ((Ghost, TApp TInt Nil) :: Nil)
-
-  (* 
-  
-  goal distinct_names: "x" <> "y"
-
-  goal lookup_other:
-    (empty_ctx["x" <- Some (Reg, TApp TInt Nil)])["y"] = None
-
-  goal lookup_two:
-    (empty_ctx["x" <- Some (Reg, TApp TInt Nil)]["y" <- Some (Ghost, TApp TBool Nil)])["x"]
-      = Some (Reg, TApp TInt Nil)
-  *)
-  
-end
-
 (* subst: substitution of values for variables *)
 module Subst
 
@@ -403,6 +324,24 @@ module Semantics
   use Subst
   use Result
   
+  (* the atoms are all values, i.e. l is some sequence vbar *)
+  predicate all_values (l : list atom) =
+    match l with
+    | Nil             -> true
+    | Cons (AVal _) r -> all_values r
+    | Cons (AVar _) _ -> false
+    end
+  
+  (* progress judgment *)    
+  predicate progress (e : expr) =
+    match e with
+      | EAtoms l   -> all_values l
+      | EGhost _   -> true
+      | ELet _ _ _ -> true
+      | EIf a _ _  -> a = AVal (VConst (CBool true)) 
+                   \/ a = AVal (VConst (CBool false))
+    end
+    
   (* vbar viewed as an atom sequence *)
   function values_atoms (vs : list value) : list atom =
     match vs with
@@ -412,15 +351,15 @@ module Semantics
     
   (* evaluation judgment *)  
   inductive eval (e : expr) (r : result) =
-    | eval_vbar     : forall l vs.
+    | eval_vbar      : forall l vs.
         l = values_atoms vs -> eval (EAtoms l) (RVals vs)
-    | eval_ghost    : forall e vs.
+    | eval_ghost     : forall e vs.
         eval e vs  -> eval (EGhost e) vs
-    | eval_if_true  : forall e1 e2 vs.
+    | eval_if_true   : forall e1 e2 vs.
         eval e1 vs -> eval (EIf (AVal (VConst (CBool true))) e1 e2) vs
-    | eval_if_false : forall e1 e2 vs.
+    | eval_if_false  : forall e1 e2 vs.
         eval e2 vs -> eval (EIf (AVal (VConst (CBool false))) e1 e2) vs 
-    | eval_let      : forall bs e1 e2 vs1 vs.
+    | eval_let       : forall bs e1 e2 vs1 vs.
         eval e1 (RVals vs1) ->
         length bs = length vs1 ->
         distinct (binder_names bs) ->
@@ -430,52 +369,122 @@ module Semantics
         eval e1 r ->
         abort r ->
         eval (ELet bs e1 e2) r
-      
+    | eval_err       : forall e.
+        not (progress e) -> eval e RErr
+ 
 end
 
-(* sanity checks for evaluation *)
-module SemanticsExamples
+module SubstLemma
 
   use int.Int
   use list.List
+  use list.Length
   use list.Mem
+  use map.Map
   use option.Option
-  use Notation
   use Syntax
+  use Masks
+  use Types
+  use Typing
+  use Subst
   use Semantics
-  use Result
+  
+  (* abar[x -> v] *)
+  lemma subst_atom_typing:
+    forall c x s t v a b ty.
+      typing_atom c[x <- Some (s, t)] a (b, ty) ->
+      typing_atom c (AVal v) (Reg, t) ->
+      typing_atom c (subst_atom x v a) ((if a = AVar x then Reg else b), ty)
 
-  (* no list of values produces an atom sequence containing a variable *)   
-  goal values_var:
-    forall vs. not (mem (AVar "x") (values_atoms vs))
+  (* abar[x -> v]: if i replace x by a value in a list of atoms, are the atoms still well-typed? *)
+  let rec lemma subst_atoms_typing (c : ctx) (x : ident) (s : ghost_status) (t : ty) 
+                                   (v : value) (l : list atom) (p : pi)
+    requires { typing_atoms c[x <- Some (s, t)] l p }
+    requires { typing_atom c (AVal v) (Reg, t) }
+    ensures  { exists q. typing_atoms c (subst_atoms x v l) q /\ le_pi q p }
+    variant  { l }
+  = match l, p with
+    | Cons _ r, Cons (_, _) p1 -> subst_atoms_typing c x s t v r p1
+    | _ -> ()
+    end
+  
+  
+  (* 
+  
+  let rec lemma subst_typing (c : ctx) (x : ident) (s : ghost_status) (t : ty)
+                             (v : value) (b' : ghost_status) (e : expr) (p : pi)
+    requires { typing c[x <- Some (s, t)] e p }
+    requires { typing_atom c (AVal v) (b' (* Reg *), t) }
+    ensures  { exists q. typing c (subst x v e) q /\ le_pi q p }
+    variant  { e }
+  = match e with
+    | EAtoms l     -> subst_atoms_typing c x s t v l p
+    (* uma subexpressão é tipada com as premissas de regra que tipou 'e', não com a conclusão do próprio 'e' *)
+    | EGhost e1    -> subst_typing c x s t v b' e1 p
+    | EIf _ e1 e2  -> subst_typing c x s t v b' e1 p; subst_typing c x s t v b' e2 p
+    | ELet _ e1 e2 -> subst_typing c x s t v b' e1 p; subst_typing c x s t v b' e2 p
+    end 
+    
+   *)
+  
+  
+  (* ghostification preserves the "at most as ghost as" order *)
+  let rec lemma le_pi_ghost (q p : pi)
+    requires { le_pi q p }
+    ensures  { le_pi (ghostification q) (ghostification p) }
+    variant  { p }
+  = match q, p with
+    | Cons _ r1, Cons _ r2 -> le_pi_ghost r1 r2
+    | _ -> ()
+    end
+    
+  (* type_union is monotone *)
+  let rec lemma le_type_union (q1 q2 p1 p2 p3 : pi)
+    requires { le_pi q1 p1 } 
+    requires { le_pi q2 p2 }
+    requires { type_union p1 p2 = Some p3 }
+    ensures  { match type_union q1 q2 with
+               | Some q3 -> le_pi q3 p3
+               | None    -> false
+               end }
+    variant  { p1 }
+  = match q1, q2, p1, p2, p3 with 
+    | Cons _ r1, Cons _ r2, Cons _ s1, Cons _ s2, Cons _ s3 -> 
+        le_type_union r1 r2 s1 s2 s3
+    | _ -> ()
+    end
+  
+  (* e[x -> v]: if x is replaced everywhere in e, is e still well-typed? *)
+    
+  let rec lemma subst_typing (x : ident) (s : ghost_status) (t : ty) (v : value) (e : expr)
+    ensures { forall c p.
+                typing c[x <- Some (s, t)] e p ->
+                typing_atom c (AVal v) (Reg, t) ->
+                exists q. typing c (subst x v e) q /\ le_pi q p }
+    variant { e }
+  = match e with
+    | EAtoms _     -> ()
+    | EGhost e1    -> subst_typing x s t v e1
+    | EIf _ e1 e2  -> subst_typing x s t v e1; subst_typing x s t v e2
+    | ELet _ e1 e2 -> subst_typing x s t v e1; subst_typing x s t v e2
+    end
+  
 
-  (* (EvalVBar) *)
-  goal eval_1:
-    eval (EAtoms (AVal (VConst (CInt 1)) :: Nil)) (RVals (VConst (CInt 42) :: Nil))
+  (* e[xbar -> vbar]: one variable at a time *)
+    
+  let rec lemma subst_all_typing (c : ctx) (bs : list (ghost_status, ident))
+                                 (vs : list value) (q : pi) (e : expr)
+    requires { distinct (binder_names bs) }
+    requires { typing_atoms c (values_atoms vs) q }
+    ensures  { forall p. typing (extend c bs (types_of q)) e p ->
+               exists p'. typing c (subst_all (binder_names bs) vs e) p' /\ le_pi p' p }
+    variant  { bs }
+  = match bs, vs, q with
+    | Cons (b, x) bs1, Cons v vs1, Cons (_, t) q1 ->
+        subst_typing x b t v e;
+        subst_all_typing c bs1 vs1 q1 (subst x v e)
+    | _ -> ()
+    end
 
-  goal eval_42:
-    eval (EAtoms (AVal (VConst (CInt 42)) :: Nil)) (RVals (VConst (CInt 42) :: Nil))
 
-  (* (EvalGhost): ghost has no effect on execution *)
-  goal eval_ghost_42:
-    eval (EGhost (EAtoms (AVal (VConst (CInt 42)) :: Nil))) (RVals (VConst (CInt 42) :: Nil))
-
-  (* (EvalIfTrue) *)
-  goal eval_if_true:
-    eval (EIf (AVal (VConst (CBool true)))
-              (EAtoms (AVal (VConst (CInt 1)) :: Nil))
-              (EAtoms (AVal (VConst (CInt 42)) :: Nil)))
-         (RVals (VConst (CInt 1) :: Nil))
-
-  (* (EvalLet): ex1 = let reg x = 42 in ghost x evaluates to 42 *)
-  goal eval_ex1:
-    eval ex1 (RVals (VConst (CInt 42) :: Nil))
-
-  (* (EvalLet), shadowing: let reg x = 1 in (let reg x = 42 in x) evaluates to 42 *)
-  goal eval_shadow:
-    eval (ELet ((Reg, "x") :: Nil) (EAtoms (AVal (VConst (CInt 1)) :: Nil))
-           (ELet ((Reg, "x") :: Nil) (EAtoms (AVal (VConst (CInt 42)) :: Nil))
-             (EAtoms (AVar "x" :: Nil))))
-         (RVals (VConst (CInt 42) :: Nil))
-
-end
+end 
