@@ -4,6 +4,7 @@
 <why3session shape_version="6">
 <prover id="0" name="CVC5" version="" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="2.4.3" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Z3" version="5.1.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml">
 <path name=".."/><path name="core_meta.mlw"/>
 <theory name="Subst">
@@ -12,7 +13,7 @@
  <goal name="subst_shadow">
  </goal>
 </theory>
-<theory name="SubstLemma">
+<theory name="SubstLemma" proved="true">
  <goal name="subst_atom_typing" proved="true">
  <transf name="intros" proved="true" arg1="c, x, s, t, v, a, b, ty, H1, H2">
   <goal name="subst_atom_typing.0" proved="true">
@@ -69,16 +70,29 @@
  <goal name="le_pi_ghost&#39;vc" expl="VC for le_pi_ghost" proved="true">
  <proof prover="1"><result status="valid" time="0.691486" steps="18537"/></proof>
  </goal>
+ <goal name="le_pi_ghostification&#39;vc" expl="VC for le_pi_ghostification" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="le_pi_ghostification&#39;vc.0" expl="variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.018006" steps="178"/></proof>
+  </goal>
+  <goal name="le_pi_ghostification&#39;vc.1" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.021627" steps="163"/></proof>
+  </goal>
+  <goal name="le_pi_ghostification&#39;vc.2" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.094773" steps="49885"/></proof>
+  </goal>
+ </transf>
+ </goal>
  <goal name="le_type_union&#39;vc" expl="VC for le_type_union" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="le_type_union&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.034190" steps="566"/></proof>
+  <proof prover="1"><result status="valid" time="0.034190" steps="574"/></proof>
   </goal>
   <goal name="le_type_union&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.039086" steps="539"/></proof>
+  <proof prover="1"><result status="valid" time="0.039086" steps="550"/></proof>
   </goal>
   <goal name="le_type_union&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.039885" steps="546"/></proof>
+  <proof prover="1"><result status="valid" time="0.039885" steps="561"/></proof>
   </goal>
   <goal name="le_type_union&#39;vc.3" expl="precondition" proved="true">
   <transf name="subst_all" proved="true" >
@@ -87,7 +101,7 @@
     <goal name="le_type_union&#39;vc.3.0.0" expl="precondition" proved="true">
     <transf name="destruct_term_subst" proved="true" arg1="x6" arg2="using" arg3="b6, t6">
      <goal name="le_type_union&#39;vc.3.0.0.0" expl="precondition" proved="true">
-     <proof prover="0"><result status="valid" time="0.024464" steps="19826"/></proof>
+     <proof prover="0"><result status="valid" time="0.024464" steps="19873"/></proof>
      </goal>
     </transf>
     </goal>
@@ -98,62 +112,73 @@
   <goal name="le_type_union&#39;vc.4" expl="postcondition" proved="true">
   <transf name="destruct_term_subst" proved="true" arg1="p1" arg2="using" arg3="a,s1">
    <goal name="le_type_union&#39;vc.4.0" expl="postcondition" proved="true">
-   <transf name="destruct_term_subst" proved="true" arg1="a" arg2="using" arg3="ga,ta">
+   <transf name="destruct_term_subst" proved="true" arg1="p2" arg2="using" arg3="b,s2">
     <goal name="le_type_union&#39;vc.4.0.0" expl="postcondition" proved="true">
-    <transf name="destruct_term_subst" proved="true" arg1="p2" arg2="using" arg3="b,s2">
+    <transf name="destruct_term_subst" proved="true" arg1="q1" arg2="using" arg3="c,r1">
      <goal name="le_type_union&#39;vc.4.0.0.0" expl="postcondition" proved="true">
-     <transf name="destruct_term_subst" proved="true" arg1="b" arg2="using" arg3="gb,tb">
+     <transf name="destruct_term_subst" proved="true" arg1="q2" arg2="using" arg3="d,r2">
       <goal name="le_type_union&#39;vc.4.0.0.0.0" expl="postcondition" proved="true">
-      <transf name="destruct_term_subst" proved="true" arg1="q1" arg2="using" arg3="c,r1">
+      <transf name="destruct_term_subst" proved="true" arg1="c" arg2="using" arg3="gc,tc">
        <goal name="le_type_union&#39;vc.4.0.0.0.0.0" expl="postcondition" proved="true">
-       <transf name="destruct_term_subst" proved="true" arg1="c" arg2="using" arg3="gc,tc">
+       <transf name="destruct_term_subst" proved="true" arg1="d" arg2="using" arg3="gd,td">
         <goal name="le_type_union&#39;vc.4.0.0.0.0.0.0" expl="postcondition" proved="true">
-        <transf name="destruct_term_subst" proved="true" arg1="q2" arg2="using" arg3="d,r2">
+        <transf name="destruct_term_subst" proved="true" arg1="a" arg2="using" arg3="ga,ta">
          <goal name="le_type_union&#39;vc.4.0.0.0.0.0.0.0" expl="postcondition" proved="true">
-         <transf name="destruct_term_subst" proved="true" arg1="d" arg2="using" arg3="gd,td">
+         <transf name="destruct_term_subst" proved="true" arg1="b" arg2="using" arg3="gb,tb">
           <goal name="le_type_union&#39;vc.4.0.0.0.0.0.0.0.0" expl="postcondition" proved="true">
-          <proof prover="0"><result status="valid" time="0.524282" steps="136887"/></proof>
+          <transf name="destruct_term_subst" proved="true" arg1="p3" arg2="using" arg3="h3,s3">
+           <goal name="le_type_union&#39;vc.4.0.0.0.0.0.0.0.0.0" expl="postcondition" proved="true">
+           <transf name="destruct_term_subst" proved="true" arg1="h3" arg2="using" arg3="g3,t3">
+            <goal name="le_type_union&#39;vc.4.0.0.0.0.0.0.0.0.0.0" expl="postcondition" proved="true">
+            <proof prover="0" timelimit="5"><result status="valid" time="2.314110" steps="392462"/></proof>
+            </goal>
+           </transf>
+           </goal>
+           <goal name="le_type_union&#39;vc.4.0.0.0.0.0.0.0.0.1" expl="postcondition" proved="true">
+           <proof prover="0"><result status="valid" time="0.026692" steps="20130"/></proof>
+           </goal>
+          </transf>
           </goal>
          </transf>
-         </goal>
-         <goal name="le_type_union&#39;vc.4.0.0.0.0.0.0.1" expl="postcondition" proved="true">
-         <proof prover="1"><result status="valid" time="0.028585" steps="287"/></proof>
          </goal>
         </transf>
         </goal>
        </transf>
        </goal>
-       <goal name="le_type_union&#39;vc.4.0.0.0.0.1" expl="postcondition" proved="true">
-       <proof prover="1"><result status="valid" time="0.022021" steps="149"/></proof>
-       </goal>
       </transf>
+      </goal>
+      <goal name="le_type_union&#39;vc.4.0.0.0.1" expl="postcondition" proved="true">
+      <proof prover="1"><result status="valid" time="0.020532" steps="318"/></proof>
       </goal>
      </transf>
      </goal>
      <goal name="le_type_union&#39;vc.4.0.0.1" expl="postcondition" proved="true">
-     <proof prover="1"><result status="valid" time="0.014473" steps="36"/></proof>
+     <proof prover="1"><result status="valid" time="0.020466" steps="174"/></proof>
      </goal>
     </transf>
+    </goal>
+    <goal name="le_type_union&#39;vc.4.0.1" expl="postcondition" proved="true">
+    <proof prover="1"><result status="valid" time="0.016196" steps="41"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="le_type_union&#39;vc.4.1" expl="postcondition" proved="true">
    <transf name="destruct_term_subst" proved="true" arg1="p2" arg2="using" arg3="b,s2">
     <goal name="le_type_union&#39;vc.4.1.0" expl="postcondition" proved="true">
-    <proof prover="1"><result status="valid" time="0.016196" steps="41"/></proof>
+    <proof prover="1"><result status="valid" time="0.014608" steps="43"/></proof>
     </goal>
     <goal name="le_type_union&#39;vc.4.1.1" expl="postcondition" proved="true">
     <transf name="destruct_term_subst" proved="true" arg1="q1" arg2="using" arg3="c,r1">
      <goal name="le_type_union&#39;vc.4.1.1.0" expl="postcondition" proved="true">
-     <proof prover="1"><result status="valid" time="0.020466" steps="118"/></proof>
+     <proof prover="1"><result status="valid" time="0.020527" steps="123"/></proof>
      </goal>
      <goal name="le_type_union&#39;vc.4.1.1.1" expl="postcondition" proved="true">
      <transf name="destruct_term_subst" proved="true" arg1="q2" arg2="using" arg3="d,r2">
       <goal name="le_type_union&#39;vc.4.1.1.1.0" expl="postcondition" proved="true">
-      <proof prover="1"><result status="valid" time="0.020532" steps="115"/></proof>
+      <proof prover="1"><result status="valid" time="0.020512" steps="119"/></proof>
       </goal>
       <goal name="le_type_union&#39;vc.4.1.1.1.1" expl="postcondition" proved="true">
-      <proof prover="1"><result status="valid" time="0.018857" steps="86"/></proof>
+      <proof prover="0" timelimit="5"><result status="valid" time="0.021675" steps="19171"/></proof>
       </goal>
      </transf>
      </goal>
@@ -165,94 +190,237 @@
   </goal>
  </transf>
  </goal>
- <goal name="subst_typing&#39;vc" expl="VC for subst_typing">
- <transf name="split_vc" >
+ <goal name="le_mask_refl&#39;vc" expl="VC for le_mask_refl" proved="true">
+ <proof prover="1"><result status="valid" time="0.016508" steps="179"/></proof>
+ </goal>
+ <goal name="le_mask_trans&#39;vc" expl="VC for le_mask_trans" proved="true">
+ <proof prover="1"><result status="valid" time="0.161804" steps="5327"/></proof>
+ </goal>
+ <goal name="binders_types_length&#39;vc" expl="VC for binders_types_length" proved="true">
+ <proof prover="0"><result status="valid" time="0.037689" steps="28387"/></proof>
+ </goal>
+ <goal name="extend_shadow&#39;vc" expl="VC for extend_shadow" proved="true">
+ <proof prover="0"><result status="valid" time="0.087353" steps="53573"/></proof>
+ </goal>
+ <goal name="extend_commute&#39;vc" expl="VC for extend_commute" proved="true">
+ <proof prover="0"><result status="valid" time="0.256635" steps="127164"/></proof>
+ </goal>
+ <goal name="subst_typing&#39;vc" expl="VC for subst_typing" proved="true">
+ <transf name="split_vc" proved="true" >
   <goal name="subst_typing&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.017974" steps="139"/></proof>
+  <proof prover="1"><result status="valid" time="0.017974" steps="208"/></proof>
   </goal>
   <goal name="subst_typing&#39;vc.1" expl="variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.021891" steps="152"/></proof>
+  <proof prover="1"><result status="valid" time="0.020854" steps="224"/></proof>
   </goal>
   <goal name="subst_typing&#39;vc.2" expl="variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.021667" steps="175"/></proof>
+  <proof prover="1"><result status="valid" time="0.021667" steps="228"/></proof>
   </goal>
   <goal name="subst_typing&#39;vc.3" expl="variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.020854" steps="156"/></proof>
+  <proof prover="1"><result status="valid" time="0.021973" steps="220"/></proof>
   </goal>
   <goal name="subst_typing&#39;vc.4" expl="variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.021973" steps="172"/></proof>
+  <proof prover="1"><result status="valid" time="0.021891" steps="223"/></proof>
   </goal>
-  <goal name="subst_typing&#39;vc.5" expl="postcondition">
-  <transf name="inversion_arg_pr" arg1="H1">
+  <goal name="subst_typing&#39;vc.5" expl="postcondition" proved="true">
+  <transf name="inversion_arg_pr" proved="true" arg1="H1">
    <goal name="subst_typing&#39;vc.5.0" expl="postcondition" proved="true">
-   <proof prover="1"><result status="valid" time="0.020811" steps="105"/></proof>
+   <proof prover="1"><result status="valid" time="0.016052" steps="128"/></proof>
    </goal>
    <goal name="subst_typing&#39;vc.5.1" expl="postcondition" proved="true">
-   <proof prover="1"><result status="valid" time="0.046981" steps="586"/></proof>
+   <proof prover="1"><result status="valid" time="0.020811" steps="625"/></proof>
    </goal>
-   <goal name="subst_typing&#39;vc.5.2" expl="postcondition">
-   <transf name="intros" arg1="c1,a,e1,e2,p1,p2,p3,Ha,He1,He2,Hu,Hp,He,Hc">
-    <goal name="subst_typing&#39;vc.5.2.0" expl="postcondition">
-    <transf name="subst" arg1="e">
-     <goal name="subst_typing&#39;vc.5.2.0.0" expl="postcondition">
+   <goal name="subst_typing&#39;vc.5.2" expl="postcondition" proved="true">
+   <transf name="intros" proved="true" arg1="c1,a,e1,e2,p1,p2,p3,Ha,He1,He2,Hu,Hp,He,Hc">
+    <goal name="subst_typing&#39;vc.5.2.0" expl="postcondition" proved="true">
+    <transf name="subst" proved="true" arg1="e">
+     <goal name="subst_typing&#39;vc.5.2.0.0" expl="postcondition" proved="true">
+     <transf name="subst" proved="true" arg1="c1">
+      <goal name="subst_typing&#39;vc.5.2.0.0.0" expl="postcondition" proved="true">
+      <transf name="subst" proved="true" arg1="p">
+       <goal name="subst_typing&#39;vc.5.2.0.0.0.0" expl="postcondition" proved="true">
+       <transf name="assert" proved="true" arg1="(forall q1 q2. typing c (subst x v e1) q1 -&gt; le_pi q1 p1 -&gt; typing c (subst x v e2) q2 -&gt; le_pi q2 p2 -&gt; exists q. typing c (subst x v (EIf a e1 e2)) q /\ le_pi q p3)" arg2="as" arg3="Hkey">
+        <goal name="subst_typing&#39;vc.5.2.0.0.0.0.0" expl="asserted formula" proved="true">
+        <transf name="intros" proved="true" arg1="q1,q2,Hq1,Hl1,Hq2,Hl2">
+         <goal name="subst_typing&#39;vc.5.2.0.0.0.0.0.0" expl="asserted formula" proved="true">
+         <transf name="instantiate" proved="true" arg1="le_type_union" arg2="q1,q2,p1,p2,p3">
+          <goal name="subst_typing&#39;vc.5.2.0.0.0.0.0.0.0" expl="asserted formula" proved="true">
+          <proof prover="0" obsolete="true"><result status="valid" time="0.084450" steps="72666"/></proof>
+          <transf name="destruct_term" proved="true" arg1="(type_union q1 q2)" arg2="using" arg3="q3">
+           <goal name="subst_typing&#39;vc.5.2.0.0.0.0.0.0.0.0" expl="asserted formula" proved="true">
+           <transf name="exists" proved="true" arg1="q3">
+            <goal name="subst_typing&#39;vc.5.2.0.0.0.0.0.0.0.0.0" proved="true">
+            <proof prover="1"><result status="valid" time="0.029817" steps="316"/></proof>
+            </goal>
+           </transf>
+           </goal>
+           <goal name="subst_typing&#39;vc.5.2.0.0.0.0.0.0.0.1" expl="asserted formula" proved="true">
+           <proof prover="1"><result status="valid" time="0.017083" steps="44"/></proof>
+           </goal>
+          </transf>
+          </goal>
+         </transf>
+         </goal>
+        </transf>
+        </goal>
+        <goal name="subst_typing&#39;vc.5.2.0.0.0.0.1" expl="postcondition" proved="true">
+        <proof prover="1"><result status="valid" time="0.030239" steps="299"/></proof>
+        </goal>
+       </transf>
+       </goal>
+      </transf>
+      </goal>
+     </transf>
      </goal>
     </transf>
     </goal>
    </transf>
    </goal>
-   <goal name="subst_typing&#39;vc.5.3" expl="postcondition">
+   <goal name="subst_typing&#39;vc.5.3" expl="postcondition" proved="true">
+   <transf name="intros" proved="true" arg1="c1,a,e1,e2,p1,p2,p3,Ha,He1,He2,Hu,Hp,He,Hc">
+    <goal name="subst_typing&#39;vc.5.3.0" expl="postcondition" proved="true">
+    <transf name="subst" proved="true" arg1="e">
+     <goal name="subst_typing&#39;vc.5.3.0.0" expl="postcondition" proved="true">
+     <transf name="subst" proved="true" arg1="p">
+      <goal name="subst_typing&#39;vc.5.3.0.0.0" expl="postcondition" proved="true">
+      <transf name="subst" proved="true" arg1="c1">
+       <goal name="subst_typing&#39;vc.5.3.0.0.0.0" expl="postcondition" proved="true">
+       <transf name="assert" proved="true" arg1="(forall q1 q2. typing c (subst x v e1) q1 -&gt; le_pi q1 p1 -&gt; typing c (subst x v e2) q2 -&gt; le_pi q2 p2 -&gt; exists q. typing c (subst x v (EIf a e1 e2)) q /\ le_pi q (ghostification p3))" arg2="as" arg3="Hkey">
+        <goal name="subst_typing&#39;vc.5.3.0.0.0.0.0" expl="asserted formula" proved="true">
+        <transf name="intros" proved="true" arg1="q1,q2,Hq1,Hl1,Hq2,Hl2">
+         <goal name="subst_typing&#39;vc.5.3.0.0.0.0.0.0" expl="asserted formula" proved="true">
+         <transf name="instantiate" proved="true" arg1="le_type_union" arg2="q1,q2,p1,p2,p3">
+          <goal name="subst_typing&#39;vc.5.3.0.0.0.0.0.0.0" expl="asserted formula" proved="true">
+          <transf name="destruct_term" proved="true" arg1="(type_union q1 q2)" arg2="using" arg3="q3">
+           <goal name="subst_typing&#39;vc.5.3.0.0.0.0.0.0.0.0" expl="asserted formula" proved="true">
+           <transf name="case" proved="true" arg1="(a = AVar x)">
+            <goal name="subst_typing&#39;vc.5.3.0.0.0.0.0.0.0.0.0" expl="true case (asserted formula)" proved="true">
+            <transf name="exists" proved="true" arg1="q3">
+             <goal name="subst_typing&#39;vc.5.3.0.0.0.0.0.0.0.0.0.0" proved="true">
+             <proof prover="1"><result status="valid" time="0.033982" steps="333"/></proof>
+             </goal>
+            </transf>
+            </goal>
+            <goal name="subst_typing&#39;vc.5.3.0.0.0.0.0.0.0.0.1" expl="false case (asserted formula)" proved="true">
+            <transf name="exists" proved="true" arg1="(ghostification q3)">
+             <goal name="subst_typing&#39;vc.5.3.0.0.0.0.0.0.0.0.1.0" proved="true">
+             <proof prover="1"><result status="valid" time="0.035351" steps="339"/></proof>
+             </goal>
+            </transf>
+            </goal>
+           </transf>
+           </goal>
+           <goal name="subst_typing&#39;vc.5.3.0.0.0.0.0.0.0.1" expl="asserted formula" proved="true">
+           <proof prover="1"><result status="valid" time="0.017352" steps="44"/></proof>
+           </goal>
+          </transf>
+          </goal>
+         </transf>
+         </goal>
+        </transf>
+        </goal>
+        <goal name="subst_typing&#39;vc.5.3.0.0.0.0.1" expl="postcondition" proved="true">
+        <proof prover="1"><result status="valid" time="0.065049" steps="1056"/></proof>
+        </goal>
+       </transf>
+       </goal>
+      </transf>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
    </goal>
-   <goal name="subst_typing&#39;vc.5.4" expl="postcondition">
+   <goal name="subst_typing&#39;vc.5.4" expl="postcondition" proved="true">
+   <transf name="intros" proved="true" arg1="c1,bs,e1,e2,p1,p2,Ht1,Hm,Hd,Ht2,Hp,He,Hc">
+    <goal name="subst_typing&#39;vc.5.4.0" expl="postcondition" proved="true">
+    <transf name="subst" proved="true" arg1="e">
+     <goal name="subst_typing&#39;vc.5.4.0.0" expl="postcondition" proved="true">
+     <transf name="subst" proved="true" arg1="p">
+      <goal name="subst_typing&#39;vc.5.4.0.0.0" expl="postcondition" proved="true">
+      <transf name="subst" proved="true" arg1="c1">
+       <goal name="subst_typing&#39;vc.5.4.0.0.0.0" expl="postcondition" proved="true">
+       <transf name="case" proved="true" arg1="(mem x (binder_names bs))">
+        <goal name="subst_typing&#39;vc.5.4.0.0.0.0.0" expl="true case (postcondition)" proved="true">
+        <transf name="exists" proved="true" arg1="p2">
+         <goal name="subst_typing&#39;vc.5.4.0.0.0.0.0.0" proved="true">
+         <proof prover="1"><result status="valid" time="0.058823" steps="872"/></proof>
+         </goal>
+        </transf>
+        </goal>
+        <goal name="subst_typing&#39;vc.5.4.0.0.0.0.1" expl="false case (postcondition)" proved="true">
+        <proof prover="1"><result status="valid" time="0.064471" steps="1028"/></proof>
+        </goal>
+       </transf>
+       </goal>
+      </transf>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
    </goal>
   </transf>
   </goal>
  </transf>
  </goal>
- <goal name="subst_all_typing&#39;vc" expl="VC for subst_all_typing">
- </goal>
-</theory>
-<theory name="SemanticsExamples">
- <goal name="values_var">
- </goal>
- <goal name="eval_42">
- </goal>
- <goal name="eval_ghost_42">
- </goal>
- <goal name="eval_if_true">
- </goal>
- <goal name="eval_ex1">
- </goal>
- <goal name="eval_shadow">
- </goal>
- <goal name="eval_free_err">
- </goal>
- <goal name="eval_if_int_err">
- </goal>
-</theory>
-<theory name="TypingExamples">
- <goal name="atom_42">
- </goal>
- <goal name="atoms_const">
- </goal>
- <goal name="atoms_var">
- </goal>
- <goal name="typing_42">
- </goal>
- <goal name="typing_ghost_42">
- </goal>
- <goal name="typing_ghost_pair">
- </goal>
- <goal name="typing_ghost_ghost_42">
- </goal>
- <goal name="if_reg">
- </goal>
- <goal name="if_contaminated">
- </goal>
- <goal name="if_ghost_test">
- </goal>
- <goal name="typing_ex1">
- </goal>
- <goal name="let_reg_into_ghost">
+ <goal name="subst_all_typing&#39;vc" expl="VC for subst_all_typing" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="subst_all_typing&#39;vc.0" expl="variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.027772" steps="276"/></proof>
+  </goal>
+  <goal name="subst_all_typing&#39;vc.1" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.025763" steps="201"/></proof>
+  </goal>
+  <goal name="subst_all_typing&#39;vc.2" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.026875" steps="200"/></proof>
+  </goal>
+  <goal name="subst_all_typing&#39;vc.3" expl="postcondition" proved="true">
+  <transf name="destruct_term_subst" proved="true" arg1="bs" arg2="using" arg3="bh,bs1">
+   <goal name="subst_all_typing&#39;vc.3.0" expl="postcondition" proved="true">
+   <transf name="destruct_term_subst" proved="true" arg1="bh" arg2="using" arg3="b,x">
+    <goal name="subst_all_typing&#39;vc.3.0.0" expl="postcondition" proved="true">
+    <transf name="destruct_term_subst" proved="true" arg1="vs" arg2="using" arg3="v,vs1">
+     <goal name="subst_all_typing&#39;vc.3.0.0.0" expl="postcondition" proved="true">
+     <transf name="destruct_term_subst" proved="true" arg1="q" arg2="using" arg3="qh,q1">
+      <goal name="subst_all_typing&#39;vc.3.0.0.0.0" expl="postcondition" proved="true">
+      <transf name="destruct_term_subst" proved="true" arg1="qh" arg2="using" arg3="g,t">
+       <goal name="subst_all_typing&#39;vc.3.0.0.0.0.0" expl="postcondition" proved="true">
+       <transf name="assert" proved="true" arg1="(typing (extend c bs1 (types_of q1))[x &lt;- Some (b, t)] e p)" arg2="as" arg3="H2">
+        <goal name="subst_all_typing&#39;vc.3.0.0.0.0.0.0" expl="asserted formula" proved="true">
+        <proof prover="1"><result status="valid" time="0.029052" steps="295"/></proof>
+        </goal>
+        <goal name="subst_all_typing&#39;vc.3.0.0.0.0.0.1" expl="postcondition" proved="true">
+        <proof prover="1"><result status="valid" time="0.894346" steps="18717"/></proof>
+        </goal>
+       </transf>
+       </goal>
+      </transf>
+      </goal>
+      <goal name="subst_all_typing&#39;vc.3.0.0.0.1" expl="postcondition" proved="true">
+      <proof prover="1"><result status="valid" time="0.023874" steps="158"/></proof>
+      </goal>
+     </transf>
+     </goal>
+     <goal name="subst_all_typing&#39;vc.3.0.0.1" expl="postcondition" proved="true">
+     <proof prover="0"><result status="valid" time="0.096756" steps="72243"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="subst_all_typing&#39;vc.3.1" expl="postcondition" proved="true">
+   <transf name="compute_in_goal" proved="true" >
+    <goal name="subst_all_typing&#39;vc.3.1.0" expl="postcondition" proved="true">
+    <proof prover="2"><result status="valid" time="0.024000" steps="173849"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
  </goal>
 </theory>
 </file>

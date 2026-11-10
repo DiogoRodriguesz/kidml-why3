@@ -406,35 +406,25 @@ module SubstLemma
   = match l, p with
     | Cons _ r, Cons (_, _) p1 -> subst_atoms_typing c x s t v r p1
     | _ -> ()
-    end
+    end  
   
-  
-  (* 
-  
-  let rec lemma subst_typing (c : ctx) (x : ident) (s : ghost_status) (t : ty)
-                             (v : value) (b' : ghost_status) (e : expr) (p : pi)
-    requires { typing c[x <- Some (s, t)] e p }
-    requires { typing_atom c (AVal v) (b' (* Reg *), t) }
-    ensures  { exists q. typing c (subst x v e) q /\ le_pi q p }
-    variant  { e }
-  = match e with
-    | EAtoms l     -> subst_atoms_typing c x s t v l p
-    (* uma subexpressão é tipada com as premissas de regra que tipou 'e', não com a conclusão do próprio 'e' *)
-    | EGhost e1    -> subst_typing c x s t v b' e1 p
-    | EIf _ e1 e2  -> subst_typing c x s t v b' e1 p; subst_typing c x s t v b' e2 p
-    | ELet _ e1 e2 -> subst_typing c x s t v b' e1 p; subst_typing c x s t v b' e2 p
-    end 
-    
-   *)
-  
-  
-  (* ghostification preserves the "at most as ghost as" order *)
+  (* ghostification is monotone *)
   let rec lemma le_pi_ghost (q p : pi)
     requires { le_pi q p }
     ensures  { le_pi (ghostification q) (ghostification p) }
     variant  { p }
   = match q, p with
     | Cons _ r1, Cons _ r2 -> le_pi_ghost r1 r2
+    | _ -> ()
+    end
+    
+  (* anything below p is also below the ghostification of p *)
+  let rec lemma le_pi_ghostification (q p : pi)
+    requires { le_pi q p }
+    ensures  { le_pi q (ghostification p) }
+    variant  { q }
+  = match q, p with
+    | Cons (_, _) r1, Cons (_, _) r2 -> le_pi_ghostification r1 r2
     | _ -> ()
     end
     
@@ -453,9 +443,62 @@ module SubstLemma
         le_type_union r1 r2 s1 s2 s3
     | _ -> ()
     end
-  
-  (* e[x -> v]: if x is replaced everywhere in e, is e still well-typed? *)
+   
+  (* mask relation is reflexive *)
+  let rec lemma le_mask_refl (m : mask)
+    ensures { le_mask m m }
+    variant { m }
+  = match m with 
+    | Cons _ r -> le_mask_refl r 
+    | _ -> ()
+    end
+   
+  (* mask relation is transitive *)
+  let rec lemma le_mask_trans (m1 m2 m3 : mask) 
+    requires { le_mask m1 m2 }
+    requires { le_mask m2 m3 }
+    ensures  { le_mask m1 m3 }
+    variant  { m1 }
+  = match m1, m2, m3 with
+    | Cons _ r1, Cons _ r2, Cons _ r3 -> le_mask_trans r1 r2 r3
+    | _ -> ()
+    end
     
+  (* if the binders fit the type p, there is one binder per component of p *)
+  let rec lemma binders_types_length (p : pi) (bs : list (ghost_status, ident))
+    requires { le_mask (mask_of p) (binder_mask bs) }
+    ensures  { length bs = length (types_of p) }
+    variant  { p }
+  = match p, bs with
+    | Cons (_, _) r, Cons (_, _) bs1 -> binders_types_length r bs1
+    | _ -> ()
+    end
+  
+   (* if x is one of the binders, its old binding is hidden by the new one *)
+  let rec lemma extend_shadow (c : ctx) (x : ident) (old_bs : option aty) 
+                              (bs : list (ghost_status, ident)) (ts : list ty)
+    requires { mem x (binder_names bs) }
+    requires { length bs = length ts }    (* every binder gets a type *) 
+    ensures  { extend c[x <- old_bs] bs ts = extend c bs ts }
+    variant  { bs }
+  = match bs, ts with
+    | Cons (s, y) bs1, Cons t ts1 ->
+        if pure { x = y } then () else extend_shadow c[y <- Some (s, t)] x old_bs bs1 ts1
+    | _ -> ()
+    end
+    
+  (* if x is not one of the binders, x can be added before or after them *)
+  let rec lemma extend_commute (c : ctx) (x : ident) (old_bs : option aty)
+                               (bs : list (ghost_status, ident)) (ts : list ty)
+    requires { not (mem x (binder_names bs)) }
+    ensures  { extend c[x <- old_bs] bs ts = (extend c bs ts)[x <- old_bs] }
+    variant  { bs }
+  = match bs, ts with
+    | Cons (s, y) bs1, Cons t ts1 -> extend_commute c[y <- Some (s, t)] x old_bs bs1 ts1
+    | _ -> ()
+    end
+    
+  (* e[x -> v]: if x is replaced everywhere in e, is e still well-typed? *)
   let rec lemma subst_typing (x : ident) (s : ghost_status) (t : ty) (v : value) (e : expr)
     ensures { forall c p.
                 typing c[x <- Some (s, t)] e p ->
@@ -471,7 +514,6 @@ module SubstLemma
   
 
   (* e[xbar -> vbar]: one variable at a time *)
-    
   let rec lemma subst_all_typing (c : ctx) (bs : list (ghost_status, ident))
                                  (vs : list value) (q : pi) (e : expr)
     requires { distinct (binder_names bs) }
