@@ -53,6 +53,12 @@ module Syntax
     | Cons x r -> not (mem x r) /\ distinct r
     end
 
+  function values_atoms (vs : list value) : list atom =
+    match vs with
+    | Nil      -> Nil
+    | Cons v r -> Cons (AVal v) (values_atoms r)
+    end
+    
 end
 
 (* result: outcomes of evaluation *)
@@ -342,13 +348,6 @@ module Semantics
                    \/ a = AVal (VConst (CBool false))
     end
     
-  (* vbar viewed as an atom sequence *)
-  function values_atoms (vs : list value) : list atom =
-    match vs with
-    | Nil      -> Nil
-    | Cons v r -> Cons (AVal v) (values_atoms r)
-    end
-    
   (* evaluation judgment *)  
   inductive eval (e : expr) (r : result) =
     | eval_vbar      : forall l vs.
@@ -374,6 +373,7 @@ module Semantics
  
 end
 
+(* SubstLemma: Lemma 3.2.6 (Substitutio *)
 module SubstLemma
 
   use int.Int
@@ -387,7 +387,6 @@ module SubstLemma
   use Types
   use Typing
   use Subst
-  use Semantics
   
   (* abar[x -> v] *)
   lemma subst_atom_typing:
@@ -396,7 +395,7 @@ module SubstLemma
       typing_atom c (AVal v) (Reg, t) ->
       typing_atom c (subst_atom x v a) ((if a = AVar x then Reg else b), ty)
 
-  (* abar[x -> v]: if i replace x by a value in a list of atoms, are the atoms still well-typed? *)
+  (* abar[x -> v] *)
   let rec lemma subst_atoms_typing (c : ctx) (x : ident) (s : ghost_status) (t : ty) 
                                    (v : value) (l : list atom) (p : pi)
     requires { typing_atoms c[x <- Some (s, t)] l p }
@@ -498,7 +497,7 @@ module SubstLemma
     | _ -> ()
     end
     
-  (* e[x -> v]: if x is replaced everywhere in e, is e still well-typed? *)
+  (* e[x -> v] *)
   let rec lemma subst_typing (x : ident) (s : ghost_status) (t : ty) (v : value) (e : expr)
     ensures { forall c p.
                 typing c[x <- Some (s, t)] e p ->
@@ -528,5 +527,40 @@ module SubstLemma
     | _ -> ()
     end
 
-
 end 
+
+(* Progress: Lemma 3.2.5 (Progress) *)
+module Progress
+
+  use list.List
+  use map.Map
+  use map.Const
+  use option.Option
+  use Syntax
+  use Types
+  use Typing
+  use Semantics
+  
+  (* in the empty context, a well-typed atom is a value *)
+  lemma typing_atom_empty: forall a t.
+    typing_atom empty_ctx a t -> exists v. a = AVal v
+    
+  (* in the empty context, a well-typed sequence of atoms is a sequence of values *)
+  let rec lemma typing_atoms_empty (l : list atom) (p : pi)
+    requires { typing_atoms empty_ctx l p }
+    ensures  { all_values l }
+    variant  { l }
+  = match l, p with
+    | Cons _ r, Cons _ p1 -> typing_atoms_empty r p1
+    | _ -> ()
+    end
+    
+  (* in the empty context, a well-typed boolean atom is the constant true or false *)
+  lemma typing_bool_empty: forall a b.
+    typing_atom empty_ctx a (b, TApp TBool Nil) ->
+    a = AVal (VConst (CBool true)) \/ a = AVal (VConst (CBool false))
+  
+  lemma typing_progress: forall e p.
+    typing empty_ctx e p -> progress e 
+
+end
