@@ -5,7 +5,7 @@
 <prover id="0" name="CVC5" version="" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="2.4.3" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="5.1.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<file format="whyml" proved="true">
+<file format="whyml">
 <path name=".."/><path name="core_meta.mlw"/>
 <theory name="Subst" proved="true">
  <goal name="subst_var" proved="true">
@@ -465,6 +465,10 @@
   </transf>
   </goal>
  </transf>
+ </goal>
+</theory>
+<theory name="EvalNotDiv">
+ <goal name="eval_not_div">
  </goal>
 </theory>
 </file>

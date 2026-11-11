@@ -341,11 +341,11 @@ module Semantics
   (* progress judgment *)    
   predicate progress (e : expr) =
     match e with
-      | EAtoms l   -> all_values l
-      | EGhost _   -> true
-      | ELet _ _ _ -> true
-      | EIf a _ _  -> a = AVal (VConst (CBool true)) 
-                   \/ a = AVal (VConst (CBool false))
+    | EAtoms l   -> all_values l
+    | EGhost _   -> true
+    | ELet _ _ _ -> true
+    | EIf a _ _  -> a = AVal (VConst (CBool true)) 
+                 \/ a = AVal (VConst (CBool false))
     end
     
   (* evaluation judgment *)  
@@ -373,7 +373,7 @@ module Semantics
  
 end
 
-(* SubstLemma: Lemma 3.2.6 (Substitutio *)
+(* SubstLemma: Lemma 3.2.6 (Substitution) *)
 module SubstLemma
 
   use int.Int
@@ -542,8 +542,9 @@ module Progress
   use Semantics
   
   (* in the empty context, a well-typed atom is a value *)
-  lemma typing_atom_empty: forall a t.
-    typing_atom empty_ctx a t -> exists v. a = AVal v
+  lemma typing_atom_empty: 
+    forall a t.
+      typing_atom empty_ctx a t -> exists v. a = AVal v
     
   (* in the empty context, a well-typed sequence of atoms is a sequence of values *)
   let rec lemma typing_atoms_empty (l : list atom) (p : pi)
@@ -556,11 +557,29 @@ module Progress
     end
     
   (* in the empty context, a well-typed boolean atom is the constant true or false *)
-  lemma typing_bool_empty: forall a b.
-    typing_atom empty_ctx a (b, TApp TBool Nil) ->
-    a = AVal (VConst (CBool true)) \/ a = AVal (VConst (CBool false))
+  lemma typing_bool_empty: 
+    forall a b.
+      typing_atom empty_ctx a (b, TApp TBool Nil) ->
+      a = AVal (VConst (CBool true)) \/ a = AVal (VConst (CBool false))
   
-  lemma typing_progress: forall e p.
-    typing empty_ctx e p -> progress e 
+  (* Lemma 3.2.5 (Progress) *)
+  lemma typing_progress: 
+    forall e p.
+      typing empty_ctx e p -> progress e 
+
+end
+
+(* Lemma 3.2.1: evaluation never produces div *)
+module EvalNotDiv
+
+  use list.List
+  use Syntax
+  use Subst
+  use Result
+  use Semantics
+  
+  lemma eval_not_div: 
+    forall e r.
+      eval e r -> r <> RDiv 
 
 end
