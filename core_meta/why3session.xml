@@ -471,5 +471,13 @@
  <goal name="eval_not_div">
  </goal>
 </theory>
+<theory name="Preservation">
+ <goal name="preservation">
+ <transf name="intros" arg1="e,r,H">
+  <goal name="preservation.0">
+  </goal>
+ </transf>
+ </goal>
+</theory>
 </file>
 </why3session>

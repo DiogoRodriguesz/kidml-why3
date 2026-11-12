@@ -476,8 +476,8 @@ module SubstLemma
    (* if x is one of the binders, its old binding is hidden by the new one *)
   let rec lemma extend_shadow (c : ctx) (x : ident) (old_bs : option aty) 
                               (bs : list (ghost_status, ident)) (ts : list ty)
-    requires { mem x (binder_names bs) }
-    requires { length bs = length ts }    (* every binder gets a type *) 
+    requires { mem x (binder_names bs) } 
+    requires { length bs = length ts } (* every binder gets a type *)
     ensures  { extend c[x <- old_bs] bs ts = extend c bs ts }
     variant  { bs }
   = match bs, ts with
@@ -569,7 +569,7 @@ module Progress
 
 end
 
-(* Lemma 3.2.1: evaluation never produces div *)
+(* EvalNotDiv: Lemma 3.2.1 *)
 module EvalNotDiv
 
   use list.List
@@ -578,8 +578,38 @@ module EvalNotDiv
   use Result
   use Semantics
   
+  (* Lemma 3.2.1: evaluation never produces div *)
   lemma eval_not_div: 
     forall e r.
       eval e r -> r <> RDiv 
 
+end
+
+(* Lemma 3.2.8 (Preservation) *)
+module Preservation
+
+  use list.List
+  use map.Map
+  use map.Const
+  use option.Option
+  use Syntax
+  use Types
+  use Typing
+  use Result
+  use Semantics
+  
+  (* a result is well-typed *)  
+  predicate typing_result (r : result) (p : pi) =
+    match r with
+    | RVals vs -> typing_atoms empty_ctx (values_atoms vs) p
+    | RErr     -> false
+    | _        -> true
+    end
+
+  (* Lemma 3.2.8 (Preservation) *)
+  lemma preservation:
+    forall e r. eval e r ->
+        forall p. typing empty_ctx e p ->
+          exists q. typing_result r q /\ le_pi q p
+          
 end
