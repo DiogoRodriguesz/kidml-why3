@@ -597,6 +597,8 @@ module Preservation
   use Typing
   use Result
   use Semantics
+  use SubstLemma
+  use Progress
   
   (* a result is well-typed *)  
   predicate typing_result (r : result) (p : pi) =
@@ -605,6 +607,40 @@ module Preservation
     | RErr     -> false
     | _        -> true
     end
+
+  (* the union of two types is at least as ghost as each of them *)
+  let rec lemma type_union_upper (p1 p2 p3 : pi)
+    requires { type_union p1 p2 = Some p3 }
+    ensures  { le_pi p1 p3 /\ le_pi p2 p3 }
+    variant  { p1 }
+  = match p1, p2, p3 with
+    | Cons (_, _) r1, Cons (_, _) r2, Cons (_, _) r3 -> type_union_upper r1 r2 r3
+    | _ -> ()
+    end
+
+(*
+  (* the union of two types is at least as ghost as its left operand *)
+  let rec lemma type_union_left (p1 p2 p3 : pi)
+    requires { type_union p1 p2 = Some p3 }
+    ensures  { le_pi p1 p3 }
+    variant  { p1 }
+  = match p1, p2, p3 with
+    | Cons (_, _) r1, Cons (_, _) r2, Cons (_, _) r3 -> type_union_left r1 r2 r3
+    | _ -> ()
+    end
+*)
+
+(*
+  (* the union of two types is at least as ghost as its right operand *)
+  let rec lemma type_union_right (p1 p2 p3 : pi)
+    requires { type_union p1 p2 = Some p3 }
+    ensures  { le_pi p2 p3 }
+    variant  { p1 }
+  = match p1, p2, p3 with
+    | Cons (_, _) r1, Cons (_, _) r2, Cons (_, _) r3 -> type_union_right r1 r2 r3
+    | _ -> ()
+    end
+*)
 
   (* Lemma 3.2.8 (Preservation) *)
   lemma preservation:

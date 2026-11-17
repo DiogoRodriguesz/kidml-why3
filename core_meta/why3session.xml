@@ -463,18 +463,108 @@
    </transf>
    </goal>
   </transf>
+  <transf name="inversion_arg_pr" proved="true" arg1="H">
+   <goal name="typing_progress.0.0" proved="true">
+   <proof prover="1"><result status="valid" time="0.014659" steps="116"/></proof>
+   </goal>
+   <goal name="typing_progress.0.1" proved="true">
+   <proof prover="1"><result status="valid" time="0.018411" steps="177"/></proof>
+   </goal>
+   <goal name="typing_progress.0.2" proved="true">
+   <proof prover="1"><result status="valid" time="0.021364" steps="306"/></proof>
+   </goal>
+   <goal name="typing_progress.0.3" proved="true">
+   <proof prover="1"><result status="valid" time="0.017246" steps="187"/></proof>
+   </goal>
+   <goal name="typing_progress.0.4" proved="true">
+   <proof prover="1"><result status="valid" time="0.018510" steps="258"/></proof>
+   </goal>
+  </transf>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="EvalNotDiv">
- <goal name="eval_not_div">
+<theory name="EvalNotDiv" proved="true">
+ <goal name="eval_not_div" proved="true">
+ <transf name="intros" proved="true" arg1="e,r">
+  <goal name="eval_not_div.0" proved="true">
+  <transf name="intros" proved="true" arg1="H">
+   <goal name="eval_not_div.0.0" proved="true">
+   <transf name="induction_arg_pr" proved="true" arg1="H" arg2="with_gen" arg3="e">
+    <goal name="eval_not_div.0.0.0" proved="true">
+    <proof prover="1"><result status="valid" time="0.015888" steps="28"/></proof>
+    </goal>
+    <goal name="eval_not_div.0.0.1" proved="true">
+    <proof prover="1"><result status="valid" time="0.012837" steps="30"/></proof>
+    </goal>
+    <goal name="eval_not_div.0.0.2" proved="true">
+    <proof prover="1"><result status="valid" time="0.016199" steps="30"/></proof>
+    </goal>
+    <goal name="eval_not_div.0.0.3" proved="true">
+    <proof prover="1"><result status="valid" time="0.013996" steps="30"/></proof>
+    </goal>
+    <goal name="eval_not_div.0.0.4" proved="true">
+    <proof prover="1"><result status="valid" time="0.012997" steps="36"/></proof>
+    </goal>
+    <goal name="eval_not_div.0.0.5" proved="true">
+    <proof prover="1"><result status="valid" time="0.011137" steps="32"/></proof>
+    </goal>
+    <goal name="eval_not_div.0.0.6" proved="true">
+    <proof prover="1"><result status="valid" time="0.008751" steps="22"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
  </goal>
 </theory>
 <theory name="Preservation">
+ <goal name="type_union_upper&#39;vc" expl="VC for type_union_upper" proved="true">
+ <proof prover="0"><result status="valid" time="0.132176" steps="67379"/></proof>
+ </goal>
  <goal name="preservation">
  <transf name="intros" arg1="e,r,H">
   <goal name="preservation.0">
+  <transf name="induction_arg_pr" arg1="H" arg2="with_gen" arg3="e,r">
+   <goal name="preservation.0.0" proved="true">
+   <transf name="compute_in_goal" proved="true" >
+    <goal name="preservation.0.0.0" proved="true">
+    <proof prover="0"><result status="valid" time="0.047263" steps="41219"/></proof>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="preservation.0.1" proved="true">
+   <proof prover="1"><result status="valid" time="0.409575" steps="7547"/></proof>
+   </goal>
+   <goal name="preservation.0.2">
+   <proof prover="0" obsolete="true"><result status="timeout" time="1.000000" steps="401110"/></proof>
+   <proof prover="1" obsolete="true"><result status="timeout" time="1.000000" steps="16659"/></proof>
+   <proof prover="2" obsolete="true"><result status="timeout" time="1.000000" steps="5436529"/></proof>
+   </goal>
+   <goal name="preservation.0.3">
+   <proof prover="0" obsolete="true"><result status="timeout" time="1.000000" steps="405960"/></proof>
+   <proof prover="1" obsolete="true"><result status="timeout" time="1.000000" steps="16424"/></proof>
+   <proof prover="2" obsolete="true"><result status="timeout" time="1.000000" steps="6331173"/></proof>
+   </goal>
+   <goal name="preservation.0.4" proved="true">
+   <proof prover="2"><result status="valid" time="0.021056" steps="149456"/></proof>
+   </goal>
+   <goal name="preservation.0.5" proved="true">
+   <transf name="intros" proved="true" arg1="bs,e1,e2,r,H1,Ha,e,r1,Hr,He,p,Ht">
+    <goal name="preservation.0.5.0" proved="true">
+    <transf name="exists" proved="true" arg1="p">
+     <goal name="preservation.0.5.0.0" proved="true">
+     <proof prover="1"><result status="valid" time="0.320695" steps="5921"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="preservation.0.6" proved="true">
+   <proof prover="1"><result status="valid" time="0.021711" steps="46"/></proof>
+   </goal>
+  </transf>
   </goal>
  </transf>
  </goal>
