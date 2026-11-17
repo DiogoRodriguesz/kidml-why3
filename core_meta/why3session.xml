@@ -569,5 +569,10 @@
  </transf>
  </goal>
 </theory>
+<theory name="TypeSoundness" proved="true">
+ <goal name="type_soundness" proved="true">
+ <proof prover="1"><result status="valid" time="0.026501" steps="148"/></proof>
+ </goal>
+</theory>
 </file>
 </why3session>

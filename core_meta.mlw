@@ -649,3 +649,19 @@ module Preservation
           exists q. typing_result r q /\ le_pi q p
           
 end
+
+(* Theorem 3.2.9 (1): type soundness *)
+module TypeSoundness
+
+  use Types
+  use Typing
+  use Result
+  use Semantics
+  use Preservation
+
+  (* a closed well-typed expression never evaluates to err *)
+  lemma type_soundness: 
+    forall e p. 
+      typing empty_ctx e p -> not (eval e RErr)
+
+end
