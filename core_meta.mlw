@@ -618,30 +618,6 @@ module Preservation
     | _ -> ()
     end
 
-(*
-  (* the union of two types is at least as ghost as its left operand *)
-  let rec lemma type_union_left (p1 p2 p3 : pi)
-    requires { type_union p1 p2 = Some p3 }
-    ensures  { le_pi p1 p3 }
-    variant  { p1 }
-  = match p1, p2, p3 with
-    | Cons (_, _) r1, Cons (_, _) r2, Cons (_, _) r3 -> type_union_left r1 r2 r3
-    | _ -> ()
-    end
-*)
-
-(*
-  (* the union of two types is at least as ghost as its right operand *)
-  let rec lemma type_union_right (p1 p2 p3 : pi)
-    requires { type_union p1 p2 = Some p3 }
-    ensures  { le_pi p2 p3 }
-    variant  { p1 }
-  = match p1, p2, p3 with
-    | Cons (_, _) r1, Cons (_, _) r2, Cons (_, _) r3 -> type_union_right r1 r2 r3
-    | _ -> ()
-    end
-*)
-
   (* Lemma 3.2.8 (Preservation) *)
   lemma preservation:
     forall e r. eval e r ->
